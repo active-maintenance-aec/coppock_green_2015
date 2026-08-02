@@ -1,0 +1,9 @@
+pair,lab_ate,field_ate,subjects,treatments,outcomes
+1,2,0.5,A,T1,money
+2,5,4,A,T1,effort
+3,3,3,A,T2,money
+4,0,3,A,T2,effort
+5,2,-1.5,B,T1,money
+6,0.5,4,B,T1,effort
+7,-2,1.5,B,T2,money
+8,-2,2,B,T2,effort

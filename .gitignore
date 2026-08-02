@@ -1,0 +1,29 @@
+# Publication documents are not redistributed here; the README links to the DOIs.
+coppock_green_2015.pdf
+coppock_green_2015_appendix.pdf
+coppock_green_2015_appendix.docx
+
+# Quarto build artifacts
+/.quarto/
+*_files/
+
+# Working log stays private, per the house rule for public repos.
+notes.md
+
+# Quarto copies referenced resources beside the PDF; the PDF embeds them.
+report/maintained/
+
+# The deposited archive is fetched from Dataverse by download_original.R, not
+# redistributed. original_extracted/ is what download_original.R unpacks it into.
+original/
+original_extracted/
+
+# Rebuilt from the deposit by clean_labfield.R.
+maintained/data/
+
+**/*.quarto_ipynb
+
+# RStudio project state
+.Rproj.user/
+.Rhistory
+.DS_Store

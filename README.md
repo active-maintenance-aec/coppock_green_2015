@@ -9,7 +9,7 @@
 - [Original archive reproducibility](#original-archive-reproducibility)
   - [What the archive regenerates](#what-the-archive-regenerates)
   - [Figure 3 and the sampler](#figure-3-and-the-sampler)
-- [Errata](#errata)
+- [Errata in the deposited code](#errata-in-the-deposited-code)
   - [The reliability is squared](#the-reliability-is-squared)
   - [The female treatment effect is standardized by a male treatment
     group](#the-female-treatment-effect-is-standardized-by-a-male-treatment-group)
@@ -17,6 +17,8 @@
     error](#the-list-2006-field-standard-error-is-the-lab-standard-error)
   - [What the three corrections do](#what-the-three-corrections-do)
 - [Number-by-number comparison](#number-by-number-comparison)
+  - [Every number in the article, and a second
+    instrument](#every-number-in-the-article-and-a-second-instrument)
 - [Maintained rewrite](#maintained-rewrite)
   - [Architecture](#architecture)
   - [Deprecated patterns replaced](#deprecated-patterns-replaced)
@@ -38,6 +40,7 @@ to a set of published archives.
 |----|----|
 | Article | [10.1017/psrm.2014.10](https://doi.org/10.1017/psrm.2014.10) |
 | Replication archive | [10.7910/DVN/25543](https://doi.org/10.7910/DVN/25543) |
+| Errata | `coppock_green_2015_errata.pdf`, built from `errata.qmd` |
 
 **The data are not redistributed here.** The deposit is a single 52 KB
 RAR container holding 16 files, and it lives at Harvard Dataverse, which
@@ -52,10 +55,16 @@ though the bytes themselves are not.
 script per published table or figure, writing to `output/`, which is
 committed so a reader can compare a fresh run against it without
 downloading anything. `ground_truth/` ties every published number to the
-code that produces it, and `build_ground_truth.R` assembles that table
-by reading every rewrite value back out of `maintained/output/`, so it
-cannot drift from the scripts. `original/` and `original_extracted/` are
-created by the download script and are deliberately absent from the
+code that produces it: `published_claims.csv` is the extraction of every
+numeric token in the article and its appendix, and
+`build_ground_truth.R` assembles the comparison table by reading every
+rewrite value back out of `maintained/output/`, so it cannot drift from
+the scripts. `maintained/in_text_claims.R` is a second, independent
+instrument that recomputes each of those numbers by its own path and
+prints it beside the sentence that states it; the build compares the two
+and stops if they disagree. `errata.qmd` builds the note listing the
+article’s own misstated claims. `original/` and `original_extracted/`
+are created by the download script and are deliberately absent from the
 repository. This file is the reproducibility report, also available as a
 PDF in `report/`.
 
@@ -70,19 +79,19 @@ source("run_all.R")
 ```
 
 That fetches the deposit, verifies it, produces every table and figure
-into `maintained/output/`, and rebuilds the ground truth from those
-outputs as its last step. Required packages: tidyverse, estimatr,
-modelsummary, patchwork, knitr, kableExtra, archive, here. Paths resolve
-through `here`, so nothing depends on the working directory. The full
-run takes about 40 seconds, almost all of it in the two scripts that
-enumerate subsets of the 21 lab-field pairs: `figure_3_robustness.R`
-evaluates the rank-order correlation across 555,790 subsets, and
-`text_sampler_reproducibility.R` runs the same enumeration twice, once
-under each of R’s two samplers. A successful run overwrites
-`maintained/output/`, which is committed: **`git diff` on that folder is
-the reproduction check.** Expect the CSV, TeX and PNG output to come
-back byte-identical and the three PDF figures to differ, because a PDF
-records the time it was written.
+into `maintained/output/`, rebuilds the ground truth from those outputs,
+and finishes by printing the in-text claims audit. Required packages:
+tidyverse, estimatr, modelsummary, patchwork, knitr, kableExtra,
+archive, here. Paths resolve through `here`, so nothing depends on the
+working directory. The full run takes about 40 seconds, almost all of it
+in the two scripts that enumerate subsets of the 21 lab-field pairs:
+`figure_3_robustness.R` evaluates the rank-order correlation across
+555,790 subsets, and `text_sampler_reproducibility.R` runs the same
+enumeration twice, once under each of R’s two samplers. A successful run
+overwrites `maintained/output/`, which is committed: **`git diff` on
+that folder is the reproduction check.** Expect the CSV, TeX and PNG
+output to come back byte-identical and the three PDF figures to differ,
+because a PDF records the time it was written.
 
 # Summary
 
@@ -109,8 +118,8 @@ in version 3.6.0. That is a property of the environment rather than a
 defect in the deposit, and the section on Figure 3 below measures how
 much it moves.
 
-Of the 25 published quantities an archive script can be checked against,
-23 match the article to the precision the article prints. The 2 that do
+Of the 34 published quantities an archive script can be checked against,
+32 match the article to the precision the article prints. The 2 that do
 not are both the article’s, not the code’s: footnote 5 truncates
 0.6995778 to 0.699 where the third decimal rounds to 0.700, and the
 text’s assertion that the median correlation “stays constant across all
@@ -127,15 +136,15 @@ alone, and why the checks in this report were run in a scratch copy.
 ## Does the maintained rewrite reproduce the paper?
 
 Yes for the headline result, and it corrects three errors along the way.
-38 of the 46 verifiable claims match the published values to reported
+45 of the 58 verifiable claims match the published values to reported
 precision, including the Spearman rank-order correlation of 0.73 that
-the abstract leads with. Seven of the 8 that do not are the
-disattenuation calculation in the Discussion and the two bounds of
-footnote 5, and each of those differs because the rewrite corrects an
-error rather than because it fails to reproduce one; the Errata section
-below sets out all three corrections. The eighth is the sentence about
-Figure 3 saying that the median correlation stays constant, which is not
-true of the archive’s output either.
+the abstract leads with. Of the 13 that do not, 5 differ because the
+rewrite corrects an error in the deposited code rather than because it
+fails to reproduce one; the Errata section below sets out all three
+corrections. The remaining 8 are sentences the article’s own data do not
+support, and they are collected in `coppock_green_2015_errata.pdf` at
+the root of this repository, which quotes each published sentence and
+prints the corrected one with its values computed at render time.
 
 The largest of the three is the disattenuated correlation, which the
 paper reports as 0.80 and the rewrite puts at 0.73. Footnote 7 defines
@@ -270,11 +279,15 @@ subset can be drawn or missed. The maintained rewrite keeps the current
 sampler, because it is the code we would write now. Where that moves a
 number, the difference belongs to R rather than to either analysis.
 
-# Errata
+# Errata in the deposited code
 
 Three errors, all of them in the archive rather than introduced by it,
 and all of them corrected in the rewrite. None changes the article’s
-conclusion.
+conclusion. Sentences in the article that its own data do not support
+are a separate matter and are collected in
+`coppock_green_2015_errata.pdf`; the first of the three below is the one
+place the two overlap, because the article’s footnote 7 states in words
+what the deposited script does in code.
 
 ## The reliability is squared
 
@@ -374,55 +387,68 @@ now candidate 12 rather than candidate 3.
 
 | Location | Quantity | Paper | Archive | Match |
 |:---|:---|:---|:---|:---|
-| Table 1 | Pair 1, lab ATE | 2 |  |  |
+| Table 1 | Pair 1, lab ATE | 2.0 |  |  |
 | Table 1 | Pair 1, field ATE | 0.5 |  |  |
-| Table 1 | Pair 2, lab ATE | 5 |  |  |
-| Table 1 | Pair 2, field ATE | 4 |  |  |
-| Table 1 | Pair 3, lab ATE | 3 |  |  |
-| Table 1 | Pair 3, field ATE | 3 |  |  |
-| Table 1 | Pair 4, lab ATE | 0 |  |  |
-| Table 1 | Pair 4, field ATE | 3 |  |  |
-| Table 1 | Pair 5, lab ATE | 2 |  |  |
+| Table 1 | Pair 2, lab ATE | 5.0 |  |  |
+| Table 1 | Pair 2, field ATE | 4.0 |  |  |
+| Table 1 | Pair 3, lab ATE | 3.0 |  |  |
+| Table 1 | Pair 3, field ATE | 3.0 |  |  |
+| Table 1 | Pair 4, lab ATE | 0.0 |  |  |
+| Table 1 | Pair 4, field ATE | 3.0 |  |  |
+| Table 1 | Pair 5, lab ATE | 2.0 |  |  |
 | Table 1 | Pair 5, field ATE | -1.5 |  |  |
 | Table 1 | Pair 6, lab ATE | 0.5 |  |  |
-| Table 1 | Pair 6, field ATE | 4 |  |  |
-| Table 1 | Pair 7, lab ATE | -2 |  |  |
+| Table 1 | Pair 6, field ATE | 4.0 |  |  |
+| Table 1 | Pair 7, lab ATE | -2.0 |  |  |
 | Table 1 | Pair 7, field ATE | 1.5 |  |  |
-| Table 1 | Pair 8, lab ATE | -2 |  |  |
-| Table 1 | Pair 8, field ATE | 2 |  |  |
-| Table 2 | Subjects (A) | 2 | 2 | 1 |
-| Table 2 | Treatments (T1) | 1 | 1 | 1 |
-| Table 2 | Outcomes (Effort) | 1 | 1 | 1 |
-| Table 2 | Contexts (Field) | 1 | 1 | 1 |
+| Table 1 | Pair 8, lab ATE | -2.0 |  |  |
+| Table 1 | Pair 8, field ATE | 2.0 |  |  |
+| Table 2 | Subjects (A) | 2.00 | 2 | 1 |
+| Table 2 | Treatments (T1) | 1.00 | 1 | 1 |
+| Table 2 | Outcomes (Effort) | 1.00 | 1 | 1 |
+| Table 2 | Contexts (Field) | 1.00 | 1 | 1 |
 | Table 2 | Constant | -0.94 | -0.9375 | 1 |
+| Text, p. 120 | Units A-type subjects add, quoted into prose | 2 | 2 | 1 |
+| Text, p. 120 | Units treatment T1 adds, quoted into prose | 1 | 1 | 1 |
+| Text, p. 120 | Units the effort outcome adds, quoted into prose | 1 | 1 | 1 |
+| Text, p. 120 | Units the field context adds, quoted into prose | 1 | 1 | 1 |
 | Table 3 | Parallel lab-field study pairs | 12 | 12 | 1 |
-| Text, p. 121 | Correlation across the eight hypothetical pairs | 0.14 |  |  |
+| Text, p. 120 | Correlation across the eight hypothetical pairs | 0.14 |  |  |
+| Text, p. 121 | Correlation across the eight hypothetical pairs, restated a page later | 0.14 |  |  |
 | Text, p. 121 | Correlation when Pairs 1 and 5 go unreported | 0.76 |  |  |
 | Figure 1 | Jerit panel, Pearson correlation | 0.21 | 0.211055 | 1 |
 | Figure 1 | Jerit panel, Spearman correlation | 0.26 | 0.259963 | 1 |
 | Figure 2 | Pooled treatment effect pairs | 21 | 21 | 1 |
 | Figure 2 | Rank-order correlation printed on the figure | 0.73 | 0.727509 | 1 |
+| Text, p. 125 | Rank-order correlation in the sentence describing Figure 2 | 0.73 | 0.727509 | 1 |
 | Abstract | Rank-order correlation | 0.73 | 0.727509 | 1 |
+| Introduction | Rank-order correlation | 0.73 | 0.727509 | 1 |
 | Footnote 5 | Jerit candidate pairs | 17 | 17 | 1 |
 | Footnote 5 | Lowest pooled rho across the candidates | 0.699 | 0.699578 | 0 |
 | Footnote 5 | Highest pooled rho across the candidates | 0.762 | 0.761936 | 1 |
 | Footnote 5 | Pooled rho including all 17 Jerit pairs | 0.56 |  |  |
 | Footnote 6 | Combinations sampled where more than 50,000 exist | 50000 | 50000 | 1 |
+| Footnote 6 | Smallest number of dropped pairs at which the cap binds | 7 |  |  |
 | Figure 3 | Lowest 25th percentile across the combination sizes |  | 0.633259 |  |
 | Figure 3 | Highest 75th percentile across the combination sizes |  | 0.790909 |  |
 | Figure 3 | Interquartile range stays within 0.6 to 0.8 across every combination size | 1 | 1 | 1 |
 | Figure 3 | Minimum correlation crosses zero when any ten pairs are dropped | 1 | 1 | 1 |
+| Figure 3 | Highest correlation when any ten pairs are dropped | 1 | 0.972727 |  |
 | Figure 3 | Distinct values of the median correlation, to two decimal places | 1 | 2 | 0 |
+| Figure 3 | Every available combination is evaluated | 1 |  |  |
 | Figure 3 | Largest change in a plotted summary value under the R 3.6 sampler |  | 0.0735553 |  |
 | Discussion | Median lab sample size per treatment condition | 40 |  |  |
 | Discussion | Median field sample size per treatment condition | 37.5 |  |  |
 | Discussion | Raw Pearson correlation across the 21 pairs | 0.64 | 0.642814 | 1 |
 | Discussion | Lab reliability | 0.78 | 0.78334 | 1 |
 | Discussion | Field reliability | 0.82 | 0.823976 | 1 |
-| Discussion | Disattenuated correlation | 0.8 | 0.800116 | 1 |
+| Discussion | Raw Pearson correlation restated inside the disattenuation formula | 0.64 | 0.642814 | 1 |
+| Discussion | Lab reliability restated inside the disattenuation formula | 0.78 | 0.78334 | 1 |
+| Discussion | Field reliability restated inside the disattenuation formula | 0.82 | 0.823976 | 1 |
+| Discussion | Disattenuated correlation | 0.80 | 0.800116 | 1 |
 | Footnote 7 | Lab reliability under the published definition | 0.78 | 0.78334 | 1 |
 | Footnote 7 | Field reliability under the published definition | 0.82 | 0.823976 | 1 |
-| Footnote 7 | Disattenuated correlation under the published definition | 0.8 | 0.800116 | 1 |
+| Footnote 7 | Disattenuated correlation under the published definition | 0.80 | 0.800116 | 1 |
 | Online Appendix Table 1 | Treatment condition rows |  | 32 |  |
 | Online Appendix Table 1 | Cells agreeing with the deposited meanstable.csv |  | 192 |  |
 | Online Appendix Table 2 | Descriptions of the twelve study pairs |  |  |  |
@@ -432,8 +458,8 @@ produce on current R. A blank Archive cell means no deposited script
 computes the quantity; a blank Paper cell means the article and its
 available appendix do not state it.
 
-Of the 52 recorded claims, 25 can be compared against what a deposited
-script prints, and 23 of those match the published value. 2 fail, and in
+Of the 65 recorded claims, 34 can be compared against what a deposited
+script prints, and 32 of those match the published value. 2 fail, and in
 both the article is the party at fault. The first is footnote 5, which
 gives the range of pooled correlations as 0.699 to 0.762 where the
 script prints 0.6995778, a value that rounds up to 0.700 at the three
@@ -443,34 +469,83 @@ permutations”, where the archive’s own procedure gives 2 distinct values
 at two decimal places, running from 0.720 to 0.729. Neither changes
 anything the paper concludes, and neither is a failure of the code.
 
-Beyond the stipulated entries of Table 1, five quantities the article
+Beyond the stipulated entries of Table 1, 8 quantities the article
 states are ones no deposited script computes: the two correlations
-quoted from the Table 1 illustration, the pooled correlation when all 17
-Jerit pairs are included, and the two median sample sizes in the
-Discussion. All five are recoverable from the deposited data and all
-five reproduce; the rewrite adds `text_hypothetical_correlations.R`,
-`text_jerit_sensitivity.R` and `text_median_sample_sizes.R` to compute
-them.
+quoted from the Table 1 illustration and one of them restated a page
+later, the pooled correlation when all 17 Jerit pairs are included, the
+two median sample sizes in the Discussion, and the two counts behind
+footnote 6 and the note to Figure 3. All are recoverable from the
+deposited data; the rewrite adds `text_hypothetical_correlations.R`,
+`text_jerit_sensitivity.R` and `text_median_sample_sizes.R`, and records
+the combination counts behind Figure 3 alongside the correlations it
+plots.
+
+## Every number in the article, and a second instrument
+
+The table above starts from the pipeline and asks what each output
+corresponds to in the article. That question cannot find a claim the
+pipeline never reaches, so the repository also works in the other
+direction. `ground_truth/published_claims.csv` is an exhaustive
+extraction: every numeric token in the body, the footnotes, the tables,
+the figures and the published appendix, read off the typeset page rather
+than searched for by pattern, together with a companion pass for numbers
+the article spells out in words, which no token scan sees. Each of the
+134 resulting claims is classified by hand.
+
+| Type         | Verified at the point of use | Checked by a block |
+|:-------------|-----------------------------:|-------------------:|
+| definitional |                            5 |                 32 |
+| descriptive  |                            0 |                  6 |
+| pipeline     |                            0 |                 30 |
+| structural   |                           11 |                 47 |
+| transcribed  |                            3 |                  0 |
+
+The extraction of every number the article states, by kind of claim.
+Pipeline and descriptive claims must be reproduced from the data;
+definitional and structural ones are checked wherever the pipeline can
+reach them and against the article’s own methods otherwise; transcribed
+ones belong to the papers they were copied from.
+
+`maintained/in_text_claims.R` carries one block per checkable claim.
+Each block quotes the article’s sentence verbatim, then recomputes the
+number from `maintained/output/` and prints it at the precision the page
+uses. It never reads the ground truth, so the two instruments reach the
+same 36 pipeline and descriptive quantities by separate paths, and
+`build_ground_truth.R` compares them value by value and halts if any
+pair disagrees. It also halts if the claims script prints a claim the
+extraction does not list, if the extraction lists a claim the script
+does not print, or if a pipeline or descriptive claim has no row in the
+ground truth. All 115 claims that require a block print one.
+
+Working from the article rather than from the outputs is what turned up
+footnote 6 and the note to Figure 3, neither of which corresponds to any
+pipeline output and neither of which the number-by-number table could
+have posed as a question. It also gives the figures coverage they would
+not otherwise have: Figure 1 prints no estimates on its face, so what
+each of its twelve panels asserts is the number of points it draws, and
+all twelve counts are checked against the published page.
 
 6 rows have no published value to compare against. 2 of them concern
 Online Appendix Table 1, the table of group means behind every panel of
 Figure 1. The appendix published with the article is the bibliography of
-the roughly 80 studies considered for inclusion, and neither of the two
-online appendix tables the text refers to is in it, so the 192 cells of
-that table cannot be checked against a published source. They are
-checked instead against `meanstable.csv`, the deposit’s own copy of the
-table, and all 192 agree exactly at the published rounding. One row is
-Online Appendix Table 2, which is prose. The other 3 are Figure 3, which
-plots points and prints no numbers.
+the studies considered for inclusion, 80 entries against a Method
+section that says approximately 80, and neither of the two online
+appendix tables the text refers to is in it, so the 192 cells of that
+table cannot be checked against a published source. They are checked
+instead against `meanstable.csv`, the deposit’s own copy of the table,
+and all 192 agree exactly at the published rounding. One row is Online
+Appendix Table 2, which is prose. The other 3 are Figure 3, which plots
+points and prints no numbers.
 
 # Maintained rewrite
 
-The rewrite lives in `maintained/`: a shared `helpers.R` and thirteen
+The rewrite lives in `maintained/`: a shared `helpers.R` and fourteen
 scripts covering one cleaning step, three published tables, three
-published figures, five sets of in-text quantities, and the sampler
-comparison behind the Figure 3 section above. It is a translation, not a
-reanalysis, except for the three errata above: every estimator,
-standardization and sample definition is the one the paper used.
+published figures, five sets of in-text quantities, the sampler
+comparison behind the Figure 3 section above, and the claims audit
+described earlier. It is a translation, not a reanalysis, except for the
+three errata above: every estimator, standardization and sample
+definition is the one the paper used.
 
 ## Architecture
 
@@ -580,68 +655,80 @@ partly to Monte Carlo noise.
 
 | Location | Quantity | Paper | Rewrite | Match |
 |:---|:---|:---|:---|:---|
-| Table 1 | Pair 1, lab ATE | 2 | 2 | 1 |
+| Table 1 | Pair 1, lab ATE | 2.0 | 2 | 1 |
 | Table 1 | Pair 1, field ATE | 0.5 | 0.5 | 1 |
-| Table 1 | Pair 2, lab ATE | 5 | 5 | 1 |
-| Table 1 | Pair 2, field ATE | 4 | 4 | 1 |
-| Table 1 | Pair 3, lab ATE | 3 | 3 | 1 |
-| Table 1 | Pair 3, field ATE | 3 | 3 | 1 |
-| Table 1 | Pair 4, lab ATE | 0 | 0 | 1 |
-| Table 1 | Pair 4, field ATE | 3 | 3 | 1 |
-| Table 1 | Pair 5, lab ATE | 2 | 2 | 1 |
+| Table 1 | Pair 2, lab ATE | 5.0 | 5 | 1 |
+| Table 1 | Pair 2, field ATE | 4.0 | 4 | 1 |
+| Table 1 | Pair 3, lab ATE | 3.0 | 3 | 1 |
+| Table 1 | Pair 3, field ATE | 3.0 | 3 | 1 |
+| Table 1 | Pair 4, lab ATE | 0.0 | 0 | 1 |
+| Table 1 | Pair 4, field ATE | 3.0 | 3 | 1 |
+| Table 1 | Pair 5, lab ATE | 2.0 | 2 | 1 |
 | Table 1 | Pair 5, field ATE | -1.5 | -1.5 | 1 |
 | Table 1 | Pair 6, lab ATE | 0.5 | 0.5 | 1 |
-| Table 1 | Pair 6, field ATE | 4 | 4 | 1 |
-| Table 1 | Pair 7, lab ATE | -2 | -2 | 1 |
+| Table 1 | Pair 6, field ATE | 4.0 | 4 | 1 |
+| Table 1 | Pair 7, lab ATE | -2.0 | -2 | 1 |
 | Table 1 | Pair 7, field ATE | 1.5 | 1.5 | 1 |
-| Table 1 | Pair 8, lab ATE | -2 | -2 | 1 |
-| Table 1 | Pair 8, field ATE | 2 | 2 | 1 |
-| Table 2 | Subjects (A) | 2 | 2 | 1 |
-| Table 2 | Treatments (T1) | 1 | 1 | 1 |
-| Table 2 | Outcomes (Effort) | 1 | 1 | 1 |
-| Table 2 | Contexts (Field) | 1 | 1 | 1 |
+| Table 1 | Pair 8, lab ATE | -2.0 | -2 | 1 |
+| Table 1 | Pair 8, field ATE | 2.0 | 2 | 1 |
+| Table 2 | Subjects (A) | 2.00 | 2 | 1 |
+| Table 2 | Treatments (T1) | 1.00 | 1 | 1 |
+| Table 2 | Outcomes (Effort) | 1.00 | 1 | 1 |
+| Table 2 | Contexts (Field) | 1.00 | 1 | 1 |
 | Table 2 | Constant | -0.94 | -0.9375 | 1 |
+| Text, p. 120 | Units A-type subjects add, quoted into prose | 2 | 2 | 1 |
+| Text, p. 120 | Units treatment T1 adds, quoted into prose | 1 | 1 | 1 |
+| Text, p. 120 | Units the effort outcome adds, quoted into prose | 1 | 1 | 1 |
+| Text, p. 120 | Units the field context adds, quoted into prose | 1 | 1 | 1 |
 | Table 3 | Parallel lab-field study pairs | 12 | 12 | 1 |
-| Text, p. 121 | Correlation across the eight hypothetical pairs | 0.14 | 0.139999 | 1 |
+| Text, p. 120 | Correlation across the eight hypothetical pairs | 0.14 | 0.139999 | 1 |
+| Text, p. 121 | Correlation across the eight hypothetical pairs, restated a page later | 0.14 | 0.139999 | 1 |
 | Text, p. 121 | Correlation when Pairs 1 and 5 go unreported | 0.76 | 0.764266 | 1 |
 | Figure 1 | Jerit panel, Pearson correlation | 0.21 | 0.211055 | 1 |
 | Figure 1 | Jerit panel, Spearman correlation | 0.26 | 0.259963 | 1 |
 | Figure 2 | Pooled treatment effect pairs | 21 | 21 | 1 |
 | Figure 2 | Rank-order correlation printed on the figure | 0.73 | 0.731406 | 1 |
+| Text, p. 125 | Rank-order correlation in the sentence describing Figure 2 | 0.73 | 0.731406 | 1 |
 | Abstract | Rank-order correlation | 0.73 | 0.731406 | 1 |
+| Introduction | Rank-order correlation | 0.73 | 0.731406 | 1 |
 | Footnote 5 | Jerit candidate pairs | 17 | 17 | 1 |
 | Footnote 5 | Lowest pooled rho across the candidates | 0.699 | 0.705424 | 0 |
 | Footnote 5 | Highest pooled rho across the candidates | 0.762 | 0.767132 | 0 |
 | Footnote 5 | Pooled rho including all 17 Jerit pairs | 0.56 | 0.558066 | 1 |
 | Footnote 6 | Combinations sampled where more than 50,000 exist | 50000 | 50000 | 1 |
+| Footnote 6 | Smallest number of dropped pairs at which the cap binds | 7 | 6 | 0 |
 | Figure 3 | Lowest 25th percentile across the combination sizes |  | 0.636364 |  |
 | Figure 3 | Highest 75th percentile across the combination sizes |  | 0.8 |  |
 | Figure 3 | Interquartile range stays within 0.6 to 0.8 across every combination size | 1 | 1 | 1 |
 | Figure 3 | Minimum correlation crosses zero when any ten pairs are dropped | 1 | 1 | 1 |
+| Figure 3 | Highest correlation when any ten pairs are dropped | 1 | 0.981818 |  |
 | Figure 3 | Distinct values of the median correlation, to two decimal places | 1 | 3 | 0 |
+| Figure 3 | Every available combination is evaluated | 1 | 0 | 0 |
 | Figure 3 | Largest change in a plotted summary value under the R 3.6 sampler |  |  |  |
 | Discussion | Median lab sample size per treatment condition | 40 | 40 | 1 |
 | Discussion | Median field sample size per treatment condition | 37.5 | 37.5 | 1 |
 | Discussion | Raw Pearson correlation across the 21 pairs | 0.64 | 0.649911 | 0 |
 | Discussion | Lab reliability | 0.78 | 0.882705 | 0 |
 | Discussion | Field reliability | 0.82 | 0.903386 | 0 |
-| Discussion | Disattenuated correlation | 0.8 | 0.727795 | 0 |
+| Discussion | Raw Pearson correlation restated inside the disattenuation formula | 0.64 | 0.649911 | 0 |
+| Discussion | Lab reliability restated inside the disattenuation formula | 0.78 | 0.882705 | 0 |
+| Discussion | Field reliability restated inside the disattenuation formula | 0.82 | 0.903386 | 0 |
+| Discussion | Disattenuated correlation | 0.80 | 0.727795 | 0 |
 | Footnote 7 | Lab reliability under the published definition | 0.78 | 0.781773 | 1 |
 | Footnote 7 | Field reliability under the published definition | 0.82 | 0.817887 | 1 |
-| Footnote 7 | Disattenuated correlation under the published definition | 0.8 | 0.812768 | 0 |
+| Footnote 7 | Disattenuated correlation under the published definition | 0.80 | 0.812768 | 0 |
 | Online Appendix Table 1 | Treatment condition rows |  | 32 |  |
 | Online Appendix Table 1 | Cells agreeing with the deposited meanstable.csv |  | 192 |  |
 | Online Appendix Table 2 | Descriptions of the twelve study pairs |  |  |  |
 
 Maintained rewrite verification: published value against rewrite output.
 
-**38** of the **46** verifiable claims match the published paper to
-reported precision. Seven of the **8** that do not are consequences of
-the three errata, and each carries a note in the ground truth saying
-which; the eighth is the median-constancy sentence, which the archive
-does not support either. Every one of those rows carries a
-`defect_locus` recording where the fault lies, and none of them is the
-rewrite.
+**45** of the **58** verifiable claims match the published paper to
+reported precision. Of the **13** that do not, 5 are consequences of the
+three code errata and carry a note in the ground truth saying which; the
+other 8 are claims the article makes that neither the archive nor the
+rewrite supports. Every one of those rows carries a `defect_locus`
+recording where the fault lies, and none of them is the rewrite.
 
 Determinism was verified by running `run_all.R` twice from a clean
 session and comparing every file it writes. All twenty CSV, TeX and PNG
@@ -656,7 +743,7 @@ identical once the embedded `CreationDate` and `ModDate` are stripped.
 |:----------|:-----------------------|
 | R version | 4.6.0                  |
 | Platform  | aarch64-apple-darwin23 |
-| Date run  | 2026-08-02             |
+| Date run  | 2026-08-03             |
 
 | Package      | Version |
 |:-------------|:--------|

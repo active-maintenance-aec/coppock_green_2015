@@ -38,8 +38,16 @@ show_number <- function(x) {
   if_else(is.na(x), NA_character_, out)
 }
 
+# value_paper is the string the article prints and is read as one. Guessed as a
+# double it would silently turn a published 0.80 into 0.8 and destroy the printed
+# precision every comparison in this repository depends on.
 gt <- read_csv(here::here("ground_truth", "coppock_green_2015_ground_truth.csv"),
-               show_col_types = FALSE)
+               col_types = cols(value_paper = col_character(), .default = col_guess()))
+
+claims <- read_csv(here::here("ground_truth", "published_claims.csv"),
+                   col_types = cols(.default = col_character(),
+                                    value_paper = col_character())) |>
+  mutate(needs_block = needs_block == "TRUE")
 ```
 
 *Drafted by Claude Opus 5 under the supervision of Alex Coppock.*
@@ -50,10 +58,11 @@ This repository holds the actively maintained replication code for Coppock and G
 |---|---|
 | Article | [10.1017/psrm.2014.10](https://doi.org/10.1017/psrm.2014.10) |
 | Replication archive | [10.7910/DVN/25543](https://doi.org/10.7910/DVN/25543) |
+| Errata | `coppock_green_2015_errata.pdf`, built from `errata.qmd` |
 
 **The data are not redistributed here.** The deposit is a single 52 KB RAR container holding 16 files, and it lives at Harvard Dataverse, which is the only copy this repository points at. `download_original.R` fetches it, verifies it, unpacks it and verifies each of the 16 members; `original_manifest.csv` pins the container and `original_members_manifest.csv` pins its contents, so the exact bytes this code was written against are recorded in version control even though the bytes themselves are not.
 
-**Repository layout.** `maintained/` is the maintained rewrite: one script per published table or figure, writing to `output/`, which is committed so a reader can compare a fresh run against it without downloading anything. `ground_truth/` ties every published number to the code that produces it, and `build_ground_truth.R` assembles that table by reading every rewrite value back out of `maintained/output/`, so it cannot drift from the scripts. `original/` and `original_extracted/` are created by the download script and are deliberately absent from the repository. This file is the reproducibility report, also available as a PDF in `report/`.
+**Repository layout.** `maintained/` is the maintained rewrite: one script per published table or figure, writing to `output/`, which is committed so a reader can compare a fresh run against it without downloading anything. `ground_truth/` ties every published number to the code that produces it: `published_claims.csv` is the extraction of every numeric token in the article and its appendix, and `build_ground_truth.R` assembles the comparison table by reading every rewrite value back out of `maintained/output/`, so it cannot drift from the scripts. `maintained/in_text_claims.R` is a second, independent instrument that recomputes each of those numbers by its own path and prints it beside the sentence that states it; the build compares the two and stops if they disagree. `errata.qmd` builds the note listing the article's own misstated claims. `original/` and `original_extracted/` are created by the download script and are deliberately absent from the repository. This file is the reproducibility report, also available as a PDF in `report/`.
 
 **License.** CC0 1.0 Universal, matching the terms of the deposit this repository maintains. See `LICENSE`.
 
@@ -63,7 +72,7 @@ This repository holds the actively maintained replication code for Coppock and G
 source("run_all.R")
 ```
 
-That fetches the deposit, verifies it, produces every table and figure into `maintained/output/`, and rebuilds the ground truth from those outputs as its last step. Required packages: tidyverse, estimatr, modelsummary, patchwork, knitr, kableExtra, archive, here. Paths resolve through `here`, so nothing depends on the working directory. The full run takes about 40 seconds, almost all of it in the two scripts that enumerate subsets of the 21 lab-field pairs: `figure_3_robustness.R` evaluates the rank-order correlation across 555,790 subsets, and `text_sampler_reproducibility.R` runs the same enumeration twice, once under each of R's two samplers. A successful run overwrites `maintained/output/`, which is committed: **`git diff` on that folder is the reproduction check.** Expect the CSV, TeX and PNG output to come back byte-identical and the three PDF figures to differ, because a PDF records the time it was written.
+That fetches the deposit, verifies it, produces every table and figure into `maintained/output/`, rebuilds the ground truth from those outputs, and finishes by printing the in-text claims audit. Required packages: tidyverse, estimatr, modelsummary, patchwork, knitr, kableExtra, archive, here. Paths resolve through `here`, so nothing depends on the working directory. The full run takes about 40 seconds, almost all of it in the two scripts that enumerate subsets of the 21 lab-field pairs: `figure_3_robustness.R` evaluates the rank-order correlation across 555,790 subsets, and `text_sampler_reproducibility.R` runs the same enumeration twice, once under each of R's two samplers. A successful run overwrites `maintained/output/`, which is committed: **`git diff` on that folder is the reproduction check.** Expect the CSV, TeX and PNG output to come back byte-identical and the three PDF figures to differ, because a PDF records the time it was written.
 
 # Summary
 
@@ -78,6 +87,14 @@ n_rewrite_differ <- sum(gt$match_rewrite == 0, na.rm = TRUE)
 n_unverifiable <- sum(is.na(gt$value_paper))
 n_appendix_rows <- sum(gt$table_figure == "Online Appendix Table 1")
 n_fig3_unverifiable <- sum(gt$table_figure == "Figure 3" & is.na(gt$value_paper))
+n_locus_archive <- sum(gt$defect_locus == "archive", na.rm = TRUE)
+n_locus_paper <- sum(gt$defect_locus == "paper_internal", na.rm = TRUE)
+n_no_script <- sum(is.na(gt$value_script) & !is.na(gt$value_paper) &
+                     gt$table_figure != "Table 1")
+
+n_extraction <- nrow(claims)
+n_needs_block <- sum(claims$needs_block)
+n_pipeline_claims <- sum(claims$claim_type %in% c("pipeline", "descriptive"))
 
 f3 <- read_csv(here::here("maintained", "output", "figure_3_robustness.csv"),
                show_col_types = FALSE)
@@ -100,7 +117,7 @@ The one thing the archive cannot do is defend itself. Four of its six scripts wr
 
 ## Does the maintained rewrite reproduce the paper?
 
-Yes for the headline result, and it corrects three errors along the way. `r n_rewrite_match` of the `r n_rewrite_verifiable` verifiable claims match the published values to reported precision, including the Spearman rank-order correlation of 0.73 that the abstract leads with. Seven of the `r n_rewrite_differ` that do not are the disattenuation calculation in the Discussion and the two bounds of footnote 5, and each of those differs because the rewrite corrects an error rather than because it fails to reproduce one; the Errata section below sets out all three corrections. The eighth is the sentence about Figure 3 saying that the median correlation stays constant, which is not true of the archive's output either.
+Yes for the headline result, and it corrects three errors along the way. `r n_rewrite_match` of the `r n_rewrite_verifiable` verifiable claims match the published values to reported precision, including the Spearman rank-order correlation of 0.73 that the abstract leads with. Of the `r n_rewrite_differ` that do not, `r n_locus_archive` differ because the rewrite corrects an error in the deposited code rather than because it fails to reproduce one; the Errata section below sets out all three corrections. The remaining `r n_locus_paper` are sentences the article's own data do not support, and they are collected in `coppock_green_2015_errata.pdf` at the root of this repository, which quotes each published sentence and prints the corrected one with its values computed at render time.
 
 The largest of the three is the disattenuated correlation, which the paper reports as 0.80 and the rewrite puts at 0.73. Footnote 7 defines the reliability of a treatment effect as the *square* of the correlation between two simulated draws, and the archive implements that definition faithfully. Spearman's correction for attenuation takes the reliability to be the correlation itself, so squaring it first inflates the corrected estimate. Correcting the definition, and two indexing errors that shift the raw correlation from 0.64 to 0.65, gives 0.73. The published conclusion is unaffected in direction: the disattenuated correlation still exceeds the observed one, and lab-field correspondence is still strong.
 
@@ -221,9 +238,9 @@ tibble(
 
 The five-number summary is barely moved: most values are identical and the largest change is `r sprintf("%.3f", max(abs(sampler$difference)))`, at the extremes where a single unlucky subset can be drawn or missed. The maintained rewrite keeps the current sampler, because it is the code we would write now. Where that moves a number, the difference belongs to R rather than to either analysis.
 
-# Errata
+# Errata in the deposited code
 
-Three errors, all of them in the archive rather than introduced by it, and all of them corrected in the rewrite. None changes the article's conclusion.
+Three errors, all of them in the archive rather than introduced by it, and all of them corrected in the rewrite. None changes the article's conclusion. Sentences in the article that its own data do not support are a separate matter and are collected in `coppock_green_2015_errata.pdf`; the first of the three below is the one place the two overlap, because the article's footnote 7 states in words what the deposited script does in code.
 
 ## The reliability is squared
 
@@ -309,13 +326,37 @@ gt |>
 
 Of the `r n_claims` recorded claims, `r n_archive_verifiable` can be compared against what a deposited script prints, and `r n_archive_match` of those match the published value. `r n_archive_fail` fail, and in both the article is the party at fault. The first is footnote 5, which gives the range of pooled correlations as 0.699 to 0.762 where the script prints 0.6995778, a value that rounds up to 0.700 at the three decimals the footnote uses. The second is the sentence describing Figure 3, which says the median correlation "stays constant across all permutations", where the archive's own procedure gives `r n_distinct(round(sampler$rounding_sampler[sampler$statistic == "Median"], 2))` distinct values at two decimal places, running from `r sprintf("%.3f", min(sampler$rounding_sampler[sampler$statistic == "Median"]))` to `r sprintf("%.3f", max(sampler$rounding_sampler[sampler$statistic == "Median"]))`. Neither changes anything the paper concludes, and neither is a failure of the code.
 
-Beyond the stipulated entries of Table 1, five quantities the article states are ones no deposited script computes: the two correlations quoted from the Table 1 illustration, the pooled correlation when all 17 Jerit pairs are included, and the two median sample sizes in the Discussion. All five are recoverable from the deposited data and all five reproduce; the rewrite adds `text_hypothetical_correlations.R`, `text_jerit_sensitivity.R` and `text_median_sample_sizes.R` to compute them.
+Beyond the stipulated entries of Table 1, `r n_no_script` quantities the article states are ones no deposited script computes: the two correlations quoted from the Table 1 illustration and one of them restated a page later, the pooled correlation when all 17 Jerit pairs are included, the two median sample sizes in the Discussion, and the two counts behind footnote 6 and the note to Figure 3. All are recoverable from the deposited data; the rewrite adds `text_hypothetical_correlations.R`, `text_jerit_sensitivity.R` and `text_median_sample_sizes.R`, and records the combination counts behind Figure 3 alongside the correlations it plots.
 
-`r n_unverifiable` rows have no published value to compare against. `r n_appendix_rows` of them concern Online Appendix Table 1, the table of group means behind every panel of Figure 1. The appendix published with the article is the bibliography of the roughly 80 studies considered for inclusion, and neither of the two online appendix tables the text refers to is in it, so the 192 cells of that table cannot be checked against a published source. They are checked instead against `meanstable.csv`, the deposit's own copy of the table, and all 192 agree exactly at the published rounding. One row is Online Appendix Table 2, which is prose. The other `r n_fig3_unverifiable` are Figure 3, which plots points and prints no numbers.
+## Every number in the article, and a second instrument
+
+The table above starts from the pipeline and asks what each output corresponds to in the article. That question cannot find a claim the pipeline never reaches, so the repository also works in the other direction. `ground_truth/published_claims.csv` is an exhaustive extraction: every numeric token in the body, the footnotes, the tables, the figures and the published appendix, read off the typeset page rather than searched for by pattern, together with a companion pass for numbers the article spells out in words, which no token scan sees. Each of the `r n_extraction` resulting claims is classified by hand.
+
+```{r claims_table}
+claims |>
+  count(claim_type, needs_block) |>
+  pivot_wider(names_from = needs_block, values_from = n, values_fill = 0L) |>
+  rename(Type = claim_type) |>
+  rename_with(\(x) if_else(x == "TRUE", "Checked by a block", x)) |>
+  rename_with(\(x) if_else(x == "FALSE", "Verified at the point of use", x)) |>
+  kable(
+    booktabs = TRUE,
+    caption = "The extraction of every number the article states, by kind of claim. Pipeline and descriptive claims must be reproduced from the data; definitional and structural ones are checked wherever the pipeline can reach them and against the article's own methods otherwise; transcribed ones belong to the papers they were copied from."
+  ) |>
+  latex_only(\(k) k |>
+    kable_styling(latex_options = "hold_position", font_size = 9) |>
+    column_spec(1, width = "3.5cm"))
+```
+
+`maintained/in_text_claims.R` carries one block per checkable claim. Each block quotes the article's sentence verbatim, then recomputes the number from `maintained/output/` and prints it at the precision the page uses. It never reads the ground truth, so the two instruments reach the same `r n_pipeline_claims` pipeline and descriptive quantities by separate paths, and `build_ground_truth.R` compares them value by value and halts if any pair disagrees. It also halts if the claims script prints a claim the extraction does not list, if the extraction lists a claim the script does not print, or if a pipeline or descriptive claim has no row in the ground truth. All `r n_needs_block` claims that require a block print one.
+
+Working from the article rather than from the outputs is what turned up footnote 6 and the note to Figure 3, neither of which corresponds to any pipeline output and neither of which the number-by-number table could have posed as a question. It also gives the figures coverage they would not otherwise have: Figure 1 prints no estimates on its face, so what each of its twelve panels asserts is the number of points it draws, and all twelve counts are checked against the published page.
+
+`r n_unverifiable` rows have no published value to compare against. `r n_appendix_rows` of them concern Online Appendix Table 1, the table of group means behind every panel of Figure 1. The appendix published with the article is the bibliography of the studies considered for inclusion, 80 entries against a Method section that says approximately 80, and neither of the two online appendix tables the text refers to is in it, so the 192 cells of that table cannot be checked against a published source. They are checked instead against `meanstable.csv`, the deposit's own copy of the table, and all 192 agree exactly at the published rounding. One row is Online Appendix Table 2, which is prose. The other `r n_fig3_unverifiable` are Figure 3, which plots points and prints no numbers.
 
 # Maintained rewrite
 
-The rewrite lives in `maintained/`: a shared `helpers.R` and thirteen scripts covering one cleaning step, three published tables, three published figures, five sets of in-text quantities, and the sampler comparison behind the Figure 3 section above. It is a translation, not a reanalysis, except for the three errata above: every estimator, standardization and sample definition is the one the paper used.
+The rewrite lives in `maintained/`: a shared `helpers.R` and fourteen scripts covering one cleaning step, three published tables, three published figures, five sets of in-text quantities, the sampler comparison behind the Figure 3 section above, and the claims audit described earlier. It is a translation, not a reanalysis, except for the three errata above: every estimator, standardization and sample definition is the one the paper used.
 
 ## Architecture
 
@@ -436,7 +477,7 @@ gt |>
     column_spec(2, width = "6cm"))
 ```
 
-**`r n_rewrite_match`** of the **`r n_rewrite_verifiable`** verifiable claims match the published paper to reported precision. Seven of the **`r n_rewrite_differ`** that do not are consequences of the three errata, and each carries a note in the ground truth saying which; the eighth is the median-constancy sentence, which the archive does not support either. Every one of those rows carries a `defect_locus` recording where the fault lies, and none of them is the rewrite.
+**`r n_rewrite_match`** of the **`r n_rewrite_verifiable`** verifiable claims match the published paper to reported precision. Of the **`r n_rewrite_differ`** that do not, `r n_locus_archive` are consequences of the three code errata and carry a note in the ground truth saying which; the other `r n_locus_paper` are claims the article makes that neither the archive nor the rewrite supports. Every one of those rows carries a `defect_locus` recording where the fault lies, and none of them is the rewrite.
 
 Determinism was verified by running `run_all.R` twice from a clean session and comparing every file it writes. All twenty CSV, TeX and PNG files in `maintained/output/`, and the ground truth CSV rebuilt from them, came back byte-identical; the three PDF figures differ, as they must, because a PDF records the time it was written, and they are identical once the embedded `CreationDate` and `ModDate` are stripped.
 

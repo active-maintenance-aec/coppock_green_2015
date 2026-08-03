@@ -55,14 +55,16 @@ results <- tibble(
                "disattenuated correlation",
                "lab reliability, squared definition of footnote 7",
                "field reliability, squared definition of footnote 7",
-               "disattenuated correlation, squared definition of footnote 7"),
+               "disattenuated correlation, squared definition of footnote 7",
+               "simulations averaged for each reliability"),
   value = c(observed,
             lab_reliability,
             field_reliability,
             observed / sqrt(lab_reliability * field_reliability),
             lab_reliability_squared,
             field_reliability_squared,
-            observed / sqrt(lab_reliability_squared * field_reliability_squared))
+            observed / sqrt(lab_reliability_squared * field_reliability_squared),
+            sims)
 ) |>
   mutate(rounded = round(value, 2))
 

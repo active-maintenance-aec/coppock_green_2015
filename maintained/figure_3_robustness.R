@@ -32,10 +32,15 @@ five_number <- function(rho) {
 }
 
 # Removing k pairs leaves every subset of size n - k.
+# n_combinations is how many subsets of that size exist and n_evaluated how many
+# were actually used, so the point at which the 50,000 cap starts to bind is
+# readable off the output rather than only from the code.
 removing <- function(k) {
   kept <- combinations(n_pairs, n_pairs - k)
   rho <- apply(kept, 2, \(i) cor(lab[i], field[i], method = "spearman"))
-  five_number(rho) |> mutate(n_used = n_pairs - k, .before = 1)
+  five_number(rho) |>
+    mutate(n_used = n_pairs - k, n_combinations = choose(n_pairs, n_pairs - k),
+           n_evaluated = ncol(kept), .before = 1)
 }
 
 # Duplicating k pairs appends a copy of each chosen pair to the full set.
@@ -43,11 +48,13 @@ duplicating <- function(k) {
   extra <- combinations(n_pairs, k)
   rho <- apply(extra, 2, \(i) cor(c(lab, lab[i]), c(field, field[i]),
                                   method = "spearman"))
-  five_number(rho) |> mutate(n_used = n_pairs + k, .before = 1)
+  five_number(rho) |>
+    mutate(n_used = n_pairs + k, n_combinations = choose(n_pairs, k),
+           n_evaluated = ncol(extra), .before = 1)
 }
 
 observed <- five_number(cor(lab, field, method = "spearman")) |>
-  mutate(n_used = n_pairs, .before = 1)
+  mutate(n_used = n_pairs, n_combinations = 1, n_evaluated = 1, .before = 1)
 
 gg_df <- bind_rows(map(1:10, removing), observed, map(1:10, duplicating)) |>
   arrange(n_used)

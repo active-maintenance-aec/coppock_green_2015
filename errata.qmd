@@ -47,68 +47,141 @@ spell <- function(n) {
 }
 ```
 
-This note lists six misstated claims in "Assessing the Correspondence between Experimental Results Obtained in the Lab and Field: A Review of Recent Social Science Research," published in *Political Science Research and Methods* 3(1), 113--131, doi [10.1017/psrm.2014.10](https://doi.org/10.1017/psrm.2014.10). **None of them changes a conclusion of the article.** The rank-order correlation of `r r2(f2$value[f2$quantity == "pooled Spearman rho, 21 pairs"])` that the abstract leads with is unaffected, and the disattenuated correlation still exceeds the raw one, so the finding that lab-field correspondence is strong stands. Each item is recorded because a reader who quoted the sentence would be quoting a claim the article's own data do not support.
+```{r entries}
+# THE ERRATA SPINE. Every entry is defined once, here, and rendered from here: into this
+# document, and into whatever else needs it, which reads the errata_entries.csv written at
+# the bottom of this file rather than keeping a second hand-typed copy.
+#
+# [[...]] marks the span that changes, on both sides. Each renderer supplies its own markup
+# for it, and this document's convention is to bold the corrected side only, so the marks
+# on the published side are stripped rather than set. Nothing else in a field is markup.
+#
+# Numbering is the published note's and is APPEND-ONLY: an entry can already have been
+# cited, so a later finding is added at the end and never interleaved.
+entries <- tribble(
+  ~entry, ~class, ~source, ~form, ~title, ~location, ~published, ~corrected, ~note,
+
+  1, "quantity", "pipeline", "full",
+  "The disattenuated correlation",
+  "published, main text",
+  "The disattenuated correlation is found to be $[[0.64]]/\\sqrt{[[0.78]]*[[0.82]]} = [[0.80]]$, further attesting to the strength of lab-field correspondence in published work.",
+  str_c("The disattenuated correlation is found to be $[[", r2(d("^raw Pearson")),
+        "]]/\\sqrt{[[", r2(d("^lab reliability$")), "]]*[[", r2(d("^field reliability$")),
+        "]]} = [[", r2(d("^disattenuated correlation$")),
+        "]]$, further attesting to the strength of lab-field correspondence in published work."),
+  str_glue(
+    "Three separate errors move this number. The two reliabilities are squared, which item ",
+    "3 sets out. The raw Pearson correlation of 0.64 is {r2(d('^raw Pearson'))} once the ",
+    "Gneezy and Rustichini (2004) female treatment effect is standardized by its own ",
+    "control group rather than by a male treatment group, as Equation 1 of the article ",
+    "requires. And the List (2006) field standard error, which enters the reliability ",
+    "simulation, is read from the lab vector in the deposited script."),
+
+  2, "quantity", "pipeline", "full",
+  "The two reliabilities",
+  "published, main text",
+  "The reliabilities for the lab and field treatment effects are [[0.78]] and [[0.82]], respectively.",
+  str_glue("The reliabilities for the lab and field treatment effects are [[{r2(d('^lab reliability$'))}]] and [[{r2(d('^field reliability$'))}]], respectively."),
+  str_glue(
+    "A correlation near 0.9 is much larger than its own square, which is why correcting the ",
+    "definition in item 3 moves these two values so far. Keeping the squared definition and ",
+    "fixing only the indexing gives {r2(d('^lab reliability, squared'))} and ",
+    "{r2(d('^field reliability, squared'))}, which is why the published pair is so close to ",
+    "what the corrected code produces under the article's own definition."),
+
+  3, "definition", "pipeline", "full",
+  "The definition of the reliability",
+  "published, footnote 7",
+  "The estimated reliability is [[the square of the correlation]] between two treatment effect draws.",
+  "The estimated reliability is [[the correlation]] between two treatment effect draws.",
+  paste(
+    "The reliability of a measure is the correlation between two parallel measurements of",
+    "it, and Spearman's correction for attenuation divides the observed correlation by the",
+    "geometric mean of the two reliabilities. Squaring the correlations first makes the",
+    "denominator too small and the corrected estimate too large. The deposited script",
+    "implements the footnote exactly as written, so the article and its code agree with each",
+    "other and both depart from the correction they invoke. The error was identified by",
+    "David Broockman (UC Berkeley)."),
+
+  4, "description", "pipeline", "full",
+  "The median correlation across permutations",
+  "published, main text",
+  "Unsurprisingly, the median correlation [[stays constant]] across all permutations.",
+  str_glue("Unsurprisingly, the median correlation [[stays between {r2(min(medians))} and {r2(max(medians))}]] across all permutations."),
+  str_glue(
+    "Figure 3 itself is right and is not reprinted here. Its median series takes ",
+    "{length(unique(round(medians, 2)))} distinct values at two decimal places across the ",
+    "{nrow(f3)} combination sizes, running from {r3(min(medians))} to {r3(max(medians))}. ",
+    "The deposited code gives the same answer at its own random draw, from 0.720 to 0.729, ",
+    "so this is a description that neither run supports rather than a number the pipeline ",
+    "has moved."),
+
+  5, "definition", "pipeline", "full",
+  "The note to Figure 3",
+  "published, note to Figure 3",
+  "*Note*: we calculate the rank-order correlations of the 21 treatment effect pairs included in the meta-analysis, under [[all possible combinations]] duplicating or removing any 1, 2, 3... or 10 of them.",
+  str_glue("*Note*: we calculate the rank-order correlations of the 21 treatment effect pairs included in the meta-analysis, under [[all possible combinations, sampled down to {comma(max(subsets$n_evaluated))} wherever more exist,]] duplicating or removing any 1, 2, 3... or 10 of them."),
+  str_glue(
+    "The note and footnote 6 contradict each other, and footnote 6 is the one the code ",
+    "follows: {comma(sum(subsets$n_evaluated))} of the {comma(sum(subsets$n_combinations))} ",
+    "available combinations were evaluated. Again the figure is right; only its note ",
+    "overstates what was computed."),
+
+  6, "quantity", "pipeline", "full",
+  "The subset size at which sampling begins",
+  "published, footnote 6",
+  "When dropping more than any [[six]] pairs, we randomly sampled 50,000 of the possible combinations.",
+  str_glue("When dropping more than any [[{spell(smallest_capped - 1)}]] pairs, we randomly sampled {comma(max(subsets$n_evaluated))} of the possible combinations."),
+  str_glue(
+    "Dropping {spell(smallest_capped)} of the {n_pairs} pairs leaves ",
+    "{comma(capped$n_combinations)} combinations, which is already above the cap, so the ",
+    "sampling applies there too; dropping {spell(smallest_capped - 1)} leaves ",
+    "{comma(uncapped$n_combinations)}, which is below it. The deposited code applies the ",
+    "same cap by the same test, so this is a description of the code rather than a change ",
+    "to it. The footnote is also silent on the duplication side of the exercise, where the ",
+    "cap binds at exactly the same point.")
+) |>
+  mutate(across(c(title, published, corrected, note), as.character))
+
+stopifnot(nrow(entries) == max(entries$entry), !anyDuplicated(entries$entry))
+
+# The spine's markup, resolved for this document. Bold means ** in prose and \mathbf{} in
+# math, which is why the resolver splits on the math delimiter rather than substituting
+# blindly: entry 1's changed spans are all inside $...$.
+bold <- function(x) {
+  pieces <- str_split_1(x, fixed("$"))
+  in_math <- seq_along(pieces) %% 2 == 0
+  pieces[in_math] <- str_replace_all(pieces[in_math], "\\[\\[(.*?)\\]\\]", "\\\\mathbf{\\1}")
+  pieces[!in_math] <- str_replace_all(pieces[!in_math], "\\[\\[(.*?)\\]\\]", "**\\1**")
+  str_flatten(pieces, "$")
+}
+
+# This note bolds the corrected side only, so the published side is set with its marks
+# removed rather than resolved.
+plain <- function(x) str_remove_all(x, "\\[\\[|\\]\\]")
+
+# A heading is only a heading when a blank line precedes it, which is why every emitted
+# entry opens with one.
+emit <- function(n) {
+  e <- entries |> filter(entry == n)
+  cat("\n\n## ", e$entry, ". ", e$title, "\n\n> ", plain(e$published),
+      "\n\nCorrected:\n\n> ", bold(e$corrected), "\n\n", e$note, "\n", sep = "")
+}
+```
+
+This note lists `r spell(nrow(entries))` misstated claims in "Assessing the Correspondence between Experimental Results Obtained in the Lab and Field: A Review of Recent Social Science Research," published in *Political Science Research and Methods* 3(1), 113--131, doi [10.1017/psrm.2014.10](https://doi.org/10.1017/psrm.2014.10). **None of them changes a conclusion of the article.** The rank-order correlation of `r r2(f2$value[f2$quantity == "pooled Spearman rho, 21 pairs"])` that the abstract leads with is unaffected, and the disattenuated correlation still exceeds the raw one, so the finding that lab-field correspondence is strong stands. Each item is recorded because a reader who quoted the sentence would be quoting a claim the article's own data do not support.
 
 The first three concern one calculation and share one cause. The last three are descriptions of the robustness exercise behind Figure 3, whose numbers are themselves correct.
 
 Every corrected value below is computed from the deposited data at the time this document is rendered; bold marks the tokens that change. The code and output supporting each correction are at [github.com/active-maintenance-aec/coppock_green_2015](https://github.com/active-maintenance-aec/coppock_green_2015).
 
-## 1. The disattenuated correlation
+```{r rendered-entries, results="asis"}
+walk(entries$entry, emit)
+```
 
-> The disattenuated correlation is found to be $0.64/\sqrt{0.78*0.82} = 0.80$, further attesting to the strength of lab-field correspondence in published work.
-
-Corrected:
-
-> The disattenuated correlation is found to be $\mathbf{`r r2(d("^raw Pearson"))`}/\sqrt{\mathbf{`r r2(d("^lab reliability$"))`}*\mathbf{`r r2(d("^field reliability$"))`}} = \mathbf{`r r2(d("^disattenuated correlation$"))`}$, further attesting to the strength of lab-field correspondence in published work.
-
-Three separate errors move this number. The two reliabilities are squared, which item 3 sets out. The raw Pearson correlation of 0.64 is `r r2(d("^raw Pearson"))` once the Gneezy and Rustichini (2004) female treatment effect is standardized by its own control group rather than by a male treatment group, as Equation 1 of the article requires. And the List (2006) field standard error, which enters the reliability simulation, is read from the lab vector in the deposited script.
-
-## 2. The two reliabilities
-
-> The reliabilities for the lab and field treatment effects are 0.78 and 0.82, respectively.
-
-Corrected:
-
-> The reliabilities for the lab and field treatment effects are **`r r2(d("^lab reliability$"))`** and **`r r2(d("^field reliability$"))`**, respectively.
-
-A correlation near 0.9 is much larger than its own square, which is why correcting the definition in item 3 moves these two values so far. Keeping the squared definition and fixing only the indexing gives `r r2(d("^lab reliability, squared"))` and `r r2(d("^field reliability, squared"))`, which is why the published pair is so close to what the corrected code produces under the article's own definition.
-
-## 3. The definition of the reliability
-
-> The estimated reliability is the square of the correlation between two treatment effect draws.
-
-Corrected:
-
-> The estimated reliability is **the correlation** between two treatment effect draws.
-
-The reliability of a measure is the correlation between two parallel measurements of it, and Spearman's correction for attenuation divides the observed correlation by the geometric mean of the two reliabilities. Squaring the correlations first makes the denominator too small and the corrected estimate too large. The deposited script implements the footnote exactly as written, so the article and its code agree with each other and both depart from the correction they invoke. The error was identified by David Broockman (UC Berkeley).
-
-## 4. The median correlation across permutations
-
-> Unsurprisingly, the median correlation stays constant across all permutations.
-
-Corrected:
-
-> Unsurprisingly, the median correlation **stays between `r r2(min(medians))` and `r r2(max(medians))`** across all permutations.
-
-Figure 3 itself is right and is not reprinted here. Its median series takes `r length(unique(round(medians, 2)))` distinct values at two decimal places across the `r nrow(f3)` combination sizes, running from `r r3(min(medians))` to `r r3(max(medians))`. The deposited code gives the same answer at its own random draw, from 0.720 to 0.729, so this is a description that neither run supports rather than a number the pipeline has moved.
-
-## 5. The note to Figure 3
-
-> *Note*: we calculate the rank-order correlations of the 21 treatment effect pairs included in the meta-analysis, under all possible combinations duplicating or removing any 1, 2, 3... or 10 of them.
-
-Corrected:
-
-> *Note*: we calculate the rank-order correlations of the 21 treatment effect pairs included in the meta-analysis, under **all possible combinations, sampled down to `r comma(max(subsets$n_evaluated))` wherever more exist,** duplicating or removing any 1, 2, 3... or 10 of them.
-
-The note and footnote 6 contradict each other, and footnote 6 is the one the code follows: `r comma(sum(subsets$n_evaluated))` of the `r comma(sum(subsets$n_combinations))` available combinations were evaluated. Again the figure is right; only its note overstates what was computed.
-
-## 6. The subset size at which sampling begins
-
-> When dropping more than any six pairs, we randomly sampled 50,000 of the possible combinations.
-
-Corrected:
-
-> When dropping more than any **`r spell(smallest_capped - 1)`** pairs, we randomly sampled `r comma(max(subsets$n_evaluated))` of the possible combinations.
-
-Dropping `r spell(smallest_capped)` of the `r n_pairs` pairs leaves `r comma(capped$n_combinations)` combinations, which is already above the cap, so the sampling applies there too; dropping `r spell(smallest_capped - 1)` leaves `r comma(uncapped$n_combinations)`, which is below it. The deposited code applies the same cap by the same test, so this is a description of the code rather than a change to it. The footnote is also silent on the duplication side of the exercise, where the cap binds at exactly the same point.
+```{r emit-spine}
+# The machine-readable spine, written wherever this document is rendered. Anything else
+# that needs these entries reads it rather than keeping its own copy, so the two cannot
+# drift.
+write_csv(entries, here("errata_entries.csv"))
+```

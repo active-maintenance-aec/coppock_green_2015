@@ -236,9 +236,9 @@ gt <- bind_rows(
     NA, "Footnote 7", "Field reliability under the published definition", 0.8239761387, "0.82",
       pick(disattenuation, "^field reliability, squared"), NA,
       "The rewrite also reports the published definition, so the correction can be traced",
-    NA, "Footnote 7", "Disattenuated correlation under the published definition", 0.8001159278, "0.80",
-      pick(disattenuation, "^disattenuated correlation, squared"), "archive",
-      "Keeping footnote 7's squared reliability and fixing only the two indexing errors gives 0.81 rather than the published 0.80, because both raise the raw Pearson correlation",
+    NA, "Footnote 7", "Disattenuated correlation under the published definition", 0.8001159278, NA,
+      pick(disattenuation, "^disattenuated correlation, squared"), NA,
+      "Keeping footnote 7's squared reliability and fixing only the two indexing errors gives 0.81 rather than the published 0.80, because both raise the raw Pearson correlation. This row carries no value_paper: the article prints 0.80 once, and disc_disattenuated is the row that compares against it. Two rows holding the same published number both took an adverse verdict, so the same defect was counted twice and this one, having no claim_id, could not be cited by the entry that corrects it",
 
     NA, "Online Appendix Table 1", "Treatment condition rows",
       pick(appendix, "treatment condition rows"), NA,

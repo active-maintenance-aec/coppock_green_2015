@@ -21,7 +21,11 @@ f3 <- read_csv(here("maintained", "output", "figure_3_robustness.csv"),
 f2 <- read_csv(here("maintained", "output", "figure_2_standardized_tes_annotations.csv"),
                show_col_types = FALSE)
 
+jerit <- read_csv(here("maintained", "output", "text_jerit_sensitivity.csv"),
+                  show_col_types = FALSE)
+
 d <- function(pattern) disatt$value[str_detect(disatt$quantity, pattern)]
+j <- function(pattern) jerit$value[str_detect(jerit$quantity, pattern)]
 r2 <- function(x) sprintf("%.2f", x)
 r3 <- function(x) sprintf("%.3f", x)
 
@@ -151,7 +155,40 @@ entries <- tribble(
     "same cap by the same test, so this is a description of the code rather than a change ",
     "to it. The footnote is also silent on the duplication side of the exercise, where the ",
     "cap binds at exactly the same point."),
-  "fn6_cap_threshold"
+  "fn6_cap_threshold",
+
+  7, "quantity", "pipeline", "full",
+  "The range of pooled correlations across the Jerit candidate pairs",
+  "published, footnote 5",
+  "Which pair we included caused slight changes in the overall correlation, ranging from [[0.699]] to [[0.762]].",
+  str_glue(
+    "Which pair we included caused slight changes in the overall correlation, ranging from ",
+    "[[{r3(j('^minimum'))}]] to [[{r3(j('^maximum'))}]]."),
+  str_glue(
+    "Both endpoints move for the reason set out in item 1: the Gneezy and Rustichini (2004) ",
+    "female treatment effect is standardized by a male treatment group rather than by its ",
+    "own control group, and correcting it shifts every pooled correlation. The lower ",
+    "endpoint is doubly wrong, because the deposited script prints ",
+    "{sprintf('%.7f', 0.6995778219)} and the footnote sets it down as 0.699, truncating ",
+    "where the three decimals it uses would round to 0.700. The claim the footnote makes ",
+    "is unaffected: which Jerit pair is included still moves the pooled correlation only ",
+    "slightly, over a range of {r3(j('^maximum') - j('^minimum'))} rather than the ",
+    "published {r3(0.7619357336 - 0.6995778219)}."),
+  "fn5_min;fn5_max",
+
+  8, "quantity", "pipeline", "full",
+  "The raw Pearson correlation, where the Discussion states it on its own",
+  "published, main text",
+  "The raw Pearson correlation among the 21 treatment effect pairs is [[0.64]].",
+  str_glue(
+    "The raw Pearson correlation among the 21 treatment effect pairs is ",
+    "[[{r2(d('^raw Pearson'))}]]."),
+  str_glue(
+    "The same quantity as the numerator item 1 corrects, stated here as a sentence of its ",
+    "own two sentences earlier, and moved by the same standardization correction. It is ",
+    "listed separately because a reader quoting this sentence would not be reading the ",
+    "formula, and the two would otherwise disagree in a corrected edition."),
+  "disc_raw_pearson"
 ) |>
   mutate(across(c(title, published, corrected, note, claim_ids), as.character))
 

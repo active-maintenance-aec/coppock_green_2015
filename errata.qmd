@@ -58,8 +58,14 @@ spell <- function(n) {
 #
 # Numbering is the published note's and is APPEND-ONLY: an entry can already have been
 # cited, so a later finding is added at the end and never interleaved.
+#
+# claim_ids names the ground-truth rows an entry corrects, semicolon-separated, so that
+# "is this finding published?" is a query rather than a judgment. It is empty where the
+# entry has no ground-truth row: entry 3 is the definition that CAUSES three of the wrong
+# values below, and a cause sentence carries no number of its own. Every id listed here is
+# checked against the ground truth by build_ground_truth.R.
 entries <- tribble(
-  ~entry, ~class, ~source, ~form, ~title, ~location, ~published, ~corrected, ~note,
+  ~entry, ~class, ~source, ~form, ~title, ~location, ~published, ~corrected, ~note, ~claim_ids,
 
   1, "quantity", "pipeline", "full",
   "The disattenuated correlation",
@@ -76,6 +82,7 @@ entries <- tribble(
     "control group rather than by a male treatment group, as Equation 1 of the article ",
     "requires. And the List (2006) field standard error, which enters the reliability ",
     "simulation, is read from the lab vector in the deposited script."),
+  "disc_disatt_numerator;disc_disatt_lab;disc_disatt_field;disc_disattenuated",
 
   2, "quantity", "pipeline", "full",
   "The two reliabilities",
@@ -88,6 +95,7 @@ entries <- tribble(
     "fixing only the indexing gives {r2(d('^lab reliability, squared'))} and ",
     "{r2(d('^field reliability, squared'))}, which is why the published pair is so close to ",
     "what the corrected code produces under the article's own definition."),
+  "disc_lab_reliability;disc_field_reliability",
 
   3, "definition", "pipeline", "full",
   "The definition of the reliability",
@@ -102,6 +110,7 @@ entries <- tribble(
     "implements the footnote exactly as written, so the article and its code agree with each",
     "other and both depart from the correction they invoke. The error was identified by",
     "David Broockman (UC Berkeley)."),
+  "",
 
   4, "description", "pipeline", "full",
   "The median correlation across permutations",
@@ -115,6 +124,7 @@ entries <- tribble(
     "The deposited code gives the same answer at its own random draw, from 0.720 to 0.729, ",
     "so this is a description that neither run supports rather than a number the pipeline ",
     "has moved."),
+  "results_median_constant",
 
   5, "definition", "pipeline", "full",
   "The note to Figure 3",
@@ -126,6 +136,7 @@ entries <- tribble(
     "follows: {comma(sum(subsets$n_evaluated))} of the {comma(sum(subsets$n_combinations))} ",
     "available combinations were evaluated. Again the figure is right; only its note ",
     "overstates what was computed."),
+  "fig3_note_all_combinations",
 
   6, "quantity", "pipeline", "full",
   "The subset size at which sampling begins",
@@ -139,9 +150,10 @@ entries <- tribble(
     "{comma(uncapped$n_combinations)}, which is below it. The deposited code applies the ",
     "same cap by the same test, so this is a description of the code rather than a change ",
     "to it. The footnote is also silent on the duplication side of the exercise, where the ",
-    "cap binds at exactly the same point.")
+    "cap binds at exactly the same point."),
+  "fn6_cap_threshold"
 ) |>
-  mutate(across(c(title, published, corrected, note), as.character))
+  mutate(across(c(title, published, corrected, note, claim_ids), as.character))
 
 stopifnot(nrow(entries) == max(entries$entry), !anyDuplicated(entries$entry))
 

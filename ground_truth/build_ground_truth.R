@@ -317,6 +317,53 @@ unknown_gt_ids <- setdiff(na.omit(gt$claim_id), claims$claim_id)
 stopifnot(length(missing_gt_rows) == 0, length(unknown_gt_ids) == 0,
           !any(duplicated(na.omit(gt$claim_id))))
 
+# Errata spine gate ----
+# Every claim id an errata entry names has to exist here. A missing one is a typo or a
+# claim that has since been renamed, and a published correction pointing at a row that is
+# not in the table is a dangling reference the build should refuse to carry.
+#
+# The rule runs in BOTH directions, and only the forward one was ever run. Added
+# 2026-08-19: an entry may not correct a claim that reproduces as published, and a
+# difference the article is at fault for has to be accounted for by an entry.
+errata_spine <- read_csv(here::here("errata_entries.csv"), show_col_types = FALSE,
+                         col_types = cols(.default = col_character()))
+
+spine_ids <- function(rows) {
+  ids <- rows$claim_ids |> str_split(";") |> unlist() |> str_trim()
+  ids[!is.na(ids) & ids != ""]
+}
+
+cited_claim_ids <- spine_ids(errata_spine)
+published_corrections <- spine_ids(filter(errata_spine, class == "quantity"))
+
+if (length(setdiff(cited_claim_ids, gt$claim_id)) > 0) {
+  print(setdiff(cited_claim_ids, gt$claim_id))
+}
+stopifnot(length(setdiff(cited_claim_ids, gt$claim_id)) == 0)
+
+# Every quantity the note corrects has to be a quantity that differs. in_text_claims.R
+# asserts the same property from the other side, on the value it computes itself; this
+# asserts it on the value recorded here, which is reached by a different path.
+uncorrected <- gt |> filter(claim_id %in% published_corrections, match_rewrite != 0)
+if (nrow(uncorrected) > 0) {
+  print(uncorrected |> select(claim_id, claim, value_paper, value_rewrite, match_rewrite),
+        n = nrow(uncorrected))
+  stop("The errata note corrects claims that reproduce as published.")
+}
+
+# And every difference the article is at fault for has to be one an entry accounts for.
+# defect_locus is read because a difference whose fault lies with the deposit or the
+# environment is not something an erratum about the article could report.
+unpublished <- gt |>
+  filter(!is.na(claim_id), defect_locus == "paper_internal",
+         (!is.na(match_rewrite) & match_rewrite == 0) | (!is.na(match) & match == 0),
+         !claim_id %in% cited_claim_ids)
+if (nrow(unpublished) > 0) {
+  print(unpublished |> select(claim_id, table_figure, claim, value_paper, value_rewrite),
+        n = nrow(unpublished))
+  stop("Claims differ from the article through the article's own fault and no errata entry says so.")
+}
+
 # The second instrument is read as a program, not as text: a block that errors at
 # runtime, or that ends in a bare expression and therefore prints nothing under
 # source(), would satisfy any check that merely looked for its claim id in the file.
@@ -324,10 +371,28 @@ claims_log <- capture.output(
   source(here::here("maintained", "in_text_claims.R"), local = new.env())
 )
 
-printed <- str_match(claims_log, "^CLAIM (\\S+) = (\\S+) \\|\\| (.*)$")
+printed <- str_match(claims_log, "^CLAIM (\\S+) = (\\S+) \\|\\| \\[(\\w+)\\] (.*)$")
 printed <- tibble(claim_id = printed[, 2], printed_value = printed[, 3],
-                  label = printed[, 4]) |>
+                  verdict = printed[, 4], label = printed[, 5]) |>
   filter(!is.na(claim_id))
+
+# Every claim the second instrument ASSERTS has to be one this script also compared, and
+# every claim it declines to assert has to be one this script can explain. The check is
+# made at this grain rather than verdict by verdict because this builder carries an
+# `approximate` flag where `coppock_green_2022` carries `comparable` plus a stochastic
+# list, so the two vocabularies do not line up one to one. The claims file names five
+# reasons for declining; this script has to have at least one for each.
+unexplained_verdicts <- printed |>
+  filter(!verdict %in% c("match", "corrected")) |>
+  inner_join(select(gt, claim_id, value_paper, match_rewrite, approximate), by = "claim_id") |>
+  filter(!approximate, !is.na(value_paper), !is.na(match_rewrite),
+         !claim_id %in% cited_claim_ids)
+if (nrow(unexplained_verdicts) > 0) {
+  print(unexplained_verdicts, n = Inf, width = 200)
+  stop("Claims the second instrument declines to assert are compared here with no exemption.")
+}
+stopifnot(all(printed$verdict %in% c("match", "corrected", "range", "derived", "absent",
+                                     "hedged", "shape")))
 
 declared <- claims$claim_id[claims$needs_block]
 stopifnot(
@@ -360,23 +425,6 @@ gt <- gt |>
   select(paper_id, claim_id, table_figure, claim, value_script, value_paper, match,
          value_rewrite, match_rewrite, defect_locus, notes)
 
-# Errata spine gate ----
-# Every claim id an errata entry names has to exist here. A missing one is a typo or a
-# claim that has since been renamed, and a published correction pointing at a row that is
-# not in the table is a dangling reference the build should refuse to carry.
-errata_path <- here::here("errata_entries.csv")
-if (file.exists(errata_path)) {
-  errata_spine <- read_csv(errata_path, show_col_types = FALSE)
-  cited_claim_ids <- errata_spine$claim_ids |>
-    str_split(";") |>
-    unlist() |>
-    str_trim()
-  cited_claim_ids <- cited_claim_ids[!is.na(cited_claim_ids) & cited_claim_ids != ""]
-  if (length(setdiff(cited_claim_ids, gt$claim_id)) > 0) {
-    print(setdiff(cited_claim_ids, gt$claim_id))
-  }
-  stopifnot(length(setdiff(cited_claim_ids, gt$claim_id)) == 0)
-}
 
 write_csv(gt, here::here("ground_truth", "coppock_green_2015_ground_truth.csv"))
 

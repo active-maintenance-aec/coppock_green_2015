@@ -70,6 +70,7 @@ spell <- function(n) {
 # checked against the ground truth by build_ground_truth.R.
 entries <- tribble(
   ~entry, ~class, ~source, ~form, ~title, ~location, ~published, ~corrected, ~note, ~claim_ids,
+  ~corrected_values, ~values_in_spans,
 
   1, "quantity", "pipeline", "full",
   "The disattenuated correlation",
@@ -87,6 +88,8 @@ entries <- tribble(
     "requires. And the List (2006) field standard error, which enters the reliability ",
     "simulation, is read from the lab vector in the deposited script."),
   "disc_disatt_numerator;disc_disatt_lab;disc_disatt_field;disc_disattenuated",
+  str_c(r2(d("^raw Pearson")), ";", r2(d("^lab reliability$")), ";",
+        r2(d("^field reliability$")), ";", r2(d("^disattenuated correlation$"))), TRUE,
 
   2, "quantity", "pipeline", "full",
   "The two reliabilities",
@@ -100,6 +103,7 @@ entries <- tribble(
     "{r2(d('^field reliability, squared'))}, which is why the published pair is so close to ",
     "what the corrected code produces under the article's own definition."),
   "disc_lab_reliability;disc_field_reliability",
+  str_c(r2(d("^lab reliability$")), ";", r2(d("^field reliability$"))), TRUE,
 
   3, "definition", "pipeline", "full",
   "The definition of the reliability",
@@ -114,7 +118,7 @@ entries <- tribble(
     "implements the footnote exactly as written, so the article and its code agree with each",
     "other and both depart from the correction they invoke. The error was identified by",
     "David Broockman (UC Berkeley)."),
-  "",
+  "", NA_character_, NA,
 
   4, "description", "pipeline", "full",
   "The median correlation across permutations",
@@ -128,7 +132,7 @@ entries <- tribble(
     "The deposited code gives the same answer at its own random draw, from 0.720 to 0.729, ",
     "so this is a description that neither run supports rather than a number the pipeline ",
     "has moved."),
-  "results_median_constant",
+  "results_median_constant", NA_character_, NA,
 
   5, "definition", "pipeline", "full",
   "The note to Figure 3",
@@ -140,7 +144,7 @@ entries <- tribble(
     "follows: {comma(sum(subsets$n_evaluated))} of the {comma(sum(subsets$n_combinations))} ",
     "available combinations were evaluated. Again the figure is right; only its note ",
     "overstates what was computed."),
-  "fig3_note_all_combinations",
+  "fig3_note_all_combinations", NA_character_, NA,
 
   6, "quantity", "pipeline", "full",
   "The subset size at which sampling begins",
@@ -155,7 +159,7 @@ entries <- tribble(
     "same cap by the same test, so this is a description of the code rather than a change ",
     "to it. The footnote is also silent on the duplication side of the exercise, where the ",
     "cap binds at exactly the same point."),
-  "fn6_cap_threshold",
+  "fn6_cap_threshold", as.character(smallest_capped), FALSE,
 
   7, "quantity", "pipeline", "full",
   "The range of pooled correlations across the Jerit candidate pairs",
@@ -175,6 +179,7 @@ entries <- tribble(
     "slightly, over a range of {r3(j('^maximum') - j('^minimum'))} rather than the ",
     "published {r3(0.7619357336 - 0.6995778219)}."),
   "fn5_min;fn5_max",
+  str_c(r3(j("^minimum")), ";", r3(j("^maximum"))), TRUE,
 
   8, "quantity", "pipeline", "full",
   "The raw Pearson correlation, where the Discussion states it on its own",
@@ -188,11 +193,70 @@ entries <- tribble(
     "own two sentences earlier, and moved by the same standardization correction. It is ",
     "listed separately because a reader quoting this sentence would not be reading the ",
     "formula, and the two would otherwise disagree in a corrected edition."),
-  "disc_raw_pearson"
+  "disc_raw_pearson", r2(d("^raw Pearson")), TRUE
 ) |>
-  mutate(across(c(title, published, corrected, note, claim_ids), as.character))
+  mutate(across(c(title, published, corrected, note, claim_ids, corrected_values), as.character))
 
 stopifnot(nrow(entries) == max(entries$entry), !anyDuplicated(entries$entry))
+
+# Gate: corrected_values agrees with the sentence it was glued into ----
+# The column and the sentence are written from one expression, so they begin in agreement
+# and this gate exists for the edit that separates them: a value moved from one marked span
+# to another, a span reworded to carry a second number, a claim id appended without its
+# value. Each value has to be inside the span it belongs to, matched by position where the
+# counts line up, and the spelled form counts as the numeral because entry 5 sets "four".
+marked_spans <- function(x) str_match_all(x, "\\[\\[(.*?)\\]\\]")[[1]][, 2]
+
+inside_span <- function(value, span) {
+  numeral <- str_detect(span, fixed(value))
+  spelled <- !is.na(suppressWarnings(as.numeric(value))) &&
+    as.numeric(value) %in% seq_len(12) &&
+    str_detect(span, fixed(spell(as.numeric(value))))
+  numeral || spelled
+}
+
+# values_in_spans is FALSE where the claim's scale is not the sentence's, which happens
+# whenever the sentence states a threshold and the extraction records the first value past
+# it. Entry 6 is the corpus's first: the footnote says sampling begins when more than any
+# five pairs are dropped, and the claim it corrects is the smallest number of dropped pairs
+# at which the cap binds, which is six. Both are right and neither is the other. THE COLUMN
+# IS ALWAYS ON THE CLAIM'S SCALE, because a claims file can only assert against the claim
+# it computes; the flag records where that parts company with the printed token, and the
+# note beside it has to say why.
+quantified <- entries |>
+  filter(!is.na(corrected_values), values_in_spans) |>
+  mutate(ids = str_split(claim_ids, ";"), values = str_split(corrected_values, ";"),
+         spans = map(corrected, marked_spans))
+
+stopifnot(all(lengths(quantified$ids) == lengths(quantified$values)))
+
+# Where a span carries two numbers at once the pairing by position is not available, so the
+# value is required to be inside some span instead. No entry here is of that shape; the
+# branch is what keeps the gate usable on a paper that has one.
+value_placed <- pmap_lgl(quantified, function(...) {
+  e <- list(...)
+  if (length(e$values) == length(e$spans)) {
+    all(map2_lgl(e$values, e$spans, inside_span))
+  } else {
+    all(map_lgl(e$values, \(v) any(map_lgl(e$spans, \(s) inside_span(v, s)))))
+  }
+})
+
+if (!all(value_placed)) {
+  print(quantified |> filter(!value_placed) |> select(entry, title, corrected_values, corrected))
+  stop("An entry's corrected_values are not in the spans of its corrected sentence.")
+}
+
+# An entry that changes a quantity has to say which one, and an entry that changes none
+# may not carry a value. The class is the declaration and this is where it binds.
+stopifnot(
+  all(!is.na(entries$corrected_values[entries$class == "quantity"])),
+  all(is.na(entries$corrected_values[entries$class != "quantity"])),
+  all(is.na(entries$corrected_values) | !is.na(entries$claim_ids)),
+  all(!is.na(entries$values_in_spans[!is.na(entries$corrected_values)])),
+  all(is.na(entries$values_in_spans[is.na(entries$corrected_values)])),
+  all(str_length(entries$note[!replace_na(entries$values_in_spans, TRUE)]) > 0)
+)
 
 # The spine's markup, resolved for this document. Bold means ** in prose and \mathbf{} in
 # math, which is why the resolver splits on the math delimiter rather than substituting

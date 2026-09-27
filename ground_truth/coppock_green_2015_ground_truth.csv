@@ -15,15 +15,15 @@ coppock_green_2015,t1_pair7_lab,Table 1,"Pair 7, lab ATE",NA,-2.0,NA,-2,1,NA,"St
 coppock_green_2015,t1_pair7_field,Table 1,"Pair 7, field ATE",NA,1.5,NA,1.5,1,NA,"Stipulated premise of the paper's illustration, not an estimate; the deposited script types the same value but prints only the Table 2 regression"
 coppock_green_2015,t1_pair8_lab,Table 1,"Pair 8, lab ATE",NA,-2.0,NA,-2,1,NA,"Stipulated premise of the paper's illustration, not an estimate; the deposited script types the same value but prints only the Table 2 regression"
 coppock_green_2015,t1_pair8_field,Table 1,"Pair 8, field ATE",NA,2.0,NA,2,1,NA,"Stipulated premise of the paper's illustration, not an estimate; the deposited script types the same value but prints only the Table 2 regression"
-coppock_green_2015,t2_subjects_a,Table 2,Subjects (A),2,2.00,1,2,1,NA,
-coppock_green_2015,t2_treatments_t1,Table 2,Treatments (T1),1,1.00,1,1.0000000000000004,1,NA,
-coppock_green_2015,t2_outcomes_effort,Table 2,Outcomes (Effort),1,1.00,1,1.0000000000000002,1,NA,
-coppock_green_2015,t2_contexts_field,Table 2,Contexts (Field),1,1.00,1,1,1,NA,
-coppock_green_2015,t2_constant,Table 2,Constant,-0.9375,-0.94,1,-0.9375,1,NA,
-coppock_green_2015,t2_text_subjects,"Text, p. 120","Units A-type subjects add, quoted into prose",2,2,1,2,1,NA,The Table 2 coefficient restated in the text at whole units
-coppock_green_2015,t2_text_treatments,"Text, p. 120","Units treatment T1 adds, quoted into prose",1,1,1,1.0000000000000004,1,NA,The Table 2 coefficient restated in the text at whole units
-coppock_green_2015,t2_text_outcomes,"Text, p. 120","Units the effort outcome adds, quoted into prose",1,1,1,1.0000000000000002,1,NA,The Table 2 coefficient restated in the text at whole units
-coppock_green_2015,t2_text_contexts,"Text, p. 120","Units the field context adds, quoted into prose",1,1,1,1,1,NA,The Table 2 coefficient restated in the text at whole units
+coppock_green_2015,t2_subjects_a,Table 2,Subjects (A),2,2.00,1,1.9999999999999991,1,NA,
+coppock_green_2015,t2_treatments_t1,Table 2,Treatments (T1),1,1.00,1,1.0000000000000002,1,NA,
+coppock_green_2015,t2_outcomes_effort,Table 2,Outcomes (Effort),1,1.00,1,1,1,NA,
+coppock_green_2015,t2_contexts_field,Table 2,Contexts (Field),1,1.00,1,0.9999999999999998,1,NA,
+coppock_green_2015,t2_constant,Table 2,Constant,-0.9375,-0.94,1,-0.937499999999999,1,NA,
+coppock_green_2015,t2_text_subjects,"Text, p. 120","Units A-type subjects add, quoted into prose",2,2,1,1.9999999999999991,1,NA,The Table 2 coefficient restated in the text at whole units
+coppock_green_2015,t2_text_treatments,"Text, p. 120","Units treatment T1 adds, quoted into prose",1,1,1,1.0000000000000002,1,NA,The Table 2 coefficient restated in the text at whole units
+coppock_green_2015,t2_text_outcomes,"Text, p. 120","Units the effort outcome adds, quoted into prose",1,1,1,1,1,NA,The Table 2 coefficient restated in the text at whole units
+coppock_green_2015,t2_text_contexts,"Text, p. 120","Units the field context adds, quoted into prose",1,1,1,0.9999999999999998,1,NA,The Table 2 coefficient restated in the text at whole units
 coppock_green_2015,t3_pairs,Table 3,Parallel lab-field study pairs,12,12,1,12,1,NA,Table 3 lists the twelve pairs by name and states no other quantity
 coppock_green_2015,text_hypothetical_corr,"Text, p. 120",Correlation across the eight hypothetical pairs,NA,0.14,NA,0.13999914969721802,1,NA,No deposited script computes this; the rewrite adds text_hypothetical_correlations.R
 coppock_green_2015,text_hypothetical_corr_restated,"Text, p. 121","Correlation across the eight hypothetical pairs, restated a page later",NA,0.14,NA,0.13999914969721802,1,NA,"The same quantity as the row above, stated twice a page apart"

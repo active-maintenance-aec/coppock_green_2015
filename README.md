@@ -118,8 +118,8 @@ in version 3.6.0. That is a property of the environment rather than a
 defect in the deposit, and the section on Figure 3 below measures how
 much it moves.
 
-Of the 34 published quantities an archive script can be checked against,
-32 match the article to the precision the article prints. The 2 that do
+Of the 33 published quantities an archive script can be checked against,
+31 match the article to the precision the article prints. The 2 that do
 not are both the article’s, not the code’s: footnote 5 truncates
 0.6995778 to 0.699 where the third decimal rounds to 0.700, and the
 text’s assertion that the median correlation “stays constant across all
@@ -136,9 +136,9 @@ alone, and why the checks in this report were run in a scratch copy.
 ## Does the maintained rewrite reproduce the paper?
 
 Yes for the headline result, and it corrects three errors along the way.
-45 of the 58 verifiable claims match the published values to reported
+45 of the 57 verifiable claims match the published values to reported
 precision, including the Spearman rank-order correlation of 0.73 that
-the abstract leads with. Of the 13 that do not, 5 differ because the
+the abstract leads with. Of the 12 that do not, 4 differ because the
 rewrite corrects an error in the deposited code rather than because it
 fails to reproduce one; the Errata section below sets out all three
 corrections. The remaining 8 are sentences the article’s own data do not
@@ -448,7 +448,7 @@ now candidate 12 rather than candidate 3.
 | Discussion | Disattenuated correlation | 0.80 | 0.800116 | 1 |
 | Footnote 7 | Lab reliability under the published definition | 0.78 | 0.78334 | 1 |
 | Footnote 7 | Field reliability under the published definition | 0.82 | 0.823976 | 1 |
-| Footnote 7 | Disattenuated correlation under the published definition | 0.80 | 0.800116 | 1 |
+| Footnote 7 | Disattenuated correlation under the published definition |  | 0.800116 |  |
 | Online Appendix Table 1 | Treatment condition rows |  | 32 |  |
 | Online Appendix Table 1 | Cells agreeing with the deposited meanstable.csv |  | 192 |  |
 | Online Appendix Table 2 | Descriptions of the twelve study pairs |  |  |  |
@@ -458,8 +458,8 @@ produce on current R. A blank Archive cell means no deposited script
 computes the quantity; a blank Paper cell means the article and its
 available appendix do not state it.
 
-Of the 65 recorded claims, 34 can be compared against what a deposited
-script prints, and 32 of those match the published value. 2 fail, and in
+Of the 65 recorded claims, 33 can be compared against what a deposited
+script prints, and 31 of those match the published value. 2 fail, and in
 both the article is the party at fault. The first is footnote 5, which
 gives the range of pooled correlations as 0.699 to 0.762 where the
 script prints 0.6995778, a value that rounds up to 0.700 at the three
@@ -525,7 +525,7 @@ not otherwise have: Figure 1 prints no estimates on its face, so what
 each of its twelve panels asserts is the number of points it draws, and
 all twelve counts are checked against the published page.
 
-6 rows have no published value to compare against. 2 of them concern
+7 rows have no published value to compare against. 2 of them concern
 Online Appendix Table 1, the table of group means behind every panel of
 Figure 1. The appendix published with the article is the bibliography of
 the studies considered for inclusion, 80 entries against a Method
@@ -716,15 +716,15 @@ partly to Monte Carlo noise.
 | Discussion | Disattenuated correlation | 0.80 | 0.727795 | 0 |
 | Footnote 7 | Lab reliability under the published definition | 0.78 | 0.781773 | 1 |
 | Footnote 7 | Field reliability under the published definition | 0.82 | 0.817887 | 1 |
-| Footnote 7 | Disattenuated correlation under the published definition | 0.80 | 0.812768 | 0 |
+| Footnote 7 | Disattenuated correlation under the published definition |  | 0.812768 |  |
 | Online Appendix Table 1 | Treatment condition rows |  | 32 |  |
 | Online Appendix Table 1 | Cells agreeing with the deposited meanstable.csv |  | 192 |  |
 | Online Appendix Table 2 | Descriptions of the twelve study pairs |  |  |  |
 
 Maintained rewrite verification: published value against rewrite output.
 
-**45** of the **58** verifiable claims match the published paper to
-reported precision. Of the **13** that do not, 5 are consequences of the
+**45** of the **57** verifiable claims match the published paper to
+reported precision. Of the **12** that do not, 4 are consequences of the
 three code errata and carry a note in the ground truth saying which; the
 other 8 are claims the article makes that neither the archive nor the
 rewrite supports. Every one of those rows carries a `defect_locus`
@@ -743,7 +743,7 @@ identical once the embedded `CreationDate` and `ModDate` are stripped.
 |:----------|:-----------------------|
 | R version | 4.6.0                  |
 | Platform  | aarch64-apple-darwin23 |
-| Date run  | 2026-08-03             |
+| Date run  | 2026-09-27             |
 
 | Package      | Version |
 |:-------------|:--------|
@@ -751,7 +751,7 @@ identical once the embedded `CreationDate` and `ModDate` are stripped.
 | dplyr        | 1.2.1   |
 | ggplot2      | 4.0.3   |
 | purrr        | 1.2.2   |
-| estimatr     | 1.0.6   |
+| estimatr     | 2.0.1   |
 | modelsummary | 2.6.0   |
 | patchwork    | 1.3.2   |
 | knitr        | 1.51    |

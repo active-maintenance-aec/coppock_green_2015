@@ -107,11 +107,11 @@ jerit_tile <-
 
 tiles <- map(seq_len(nrow(panel_specs)), \(i) tile(slice(panel_specs, i)))
 
-g <- wrap_plots(c(tiles, list(jerit_tile)), ncol = 4)
+g <- wrap_plots(c(tiles, list(jerit_tile)), ncol = 3)
 
 ggsave(here::here("maintained", "output", "figure_1_twelve_tiles.pdf"),
-       plot = g, width = 16, height = 12)
+       plot = g, width = 12, height = 15)
 ggsave(here::here("maintained", "output", "figure_1_twelve_tiles.png"),
-       plot = g, width = 16, height = 12, dpi = 200)
+       plot = g, width = 12, height = 15, dpi = 200)
 
 print(annotations)

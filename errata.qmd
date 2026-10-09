@@ -193,7 +193,21 @@ entries <- tribble(
     "own two sentences earlier, and moved by the same standardization correction. It is ",
     "listed separately because a reader quoting this sentence would not be reading the ",
     "formula, and the two would otherwise disagree in a corrected edition."),
-  "disc_raw_pearson", r2(d("^raw Pearson")), TRUE
+  "disc_raw_pearson", r2(d("^raw Pearson")), TRUE,
+
+  9, "label", "reading", "brief",
+  "Figure 1 dates the Shang, Reed and Croson panel to 2006",
+  "published, Figure 1, p. 124",
+  "Shang, Reed, and Croson ([[2006]])",
+  "Shang, Reed, and Croson ([[2008]])",
+  "", NA_character_, NA_character_, NA,
+
+  10, "spelling", "reading", "brief",
+  "Figure 1 misspells donations",
+  "published, Figure 1, p. 124",
+  "Hypothetical [[Donataions]] in the Lab",
+  "Hypothetical [[Donations]] in the Lab",
+  "", NA_character_, NA_character_, NA
 ) |>
   mutate(across(c(title, published, corrected, note, claim_ids, corrected_values), as.character))
 

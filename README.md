@@ -26,7 +26,10 @@
 - [Maintained rewrite verification](#maintained-rewrite-verification)
 - [R environment](#r-environment)
 
-**Archived at Zenodo:** [doi:10.5281/zenodo.24168336](https://doi.org/10.5281/zenodo.24168336). This DOI always resolves to the latest release of the maintained version.
+**Archived at Zenodo:**
+[doi:10.5281/zenodo.24168336](https://doi.org/10.5281/zenodo.24168336).
+This DOI always resolves to the latest release of the maintained
+version.
 
 *Drafted by Claude Opus 5 under the supervision of Alex Coppock.*
 
@@ -389,65 +392,65 @@ now candidate 12 rather than candidate 3.
 
 | Location | Quantity | Paper | Archive | Match |
 |:---|:---|:---|:---|:---|
-| Table 1 | Pair 1, lab ATE | 2.0 |  |  |
-| Table 1 | Pair 1, field ATE | 0.5 |  |  |
-| Table 1 | Pair 2, lab ATE | 5.0 |  |  |
-| Table 1 | Pair 2, field ATE | 4.0 |  |  |
-| Table 1 | Pair 3, lab ATE | 3.0 |  |  |
-| Table 1 | Pair 3, field ATE | 3.0 |  |  |
-| Table 1 | Pair 4, lab ATE | 0.0 |  |  |
-| Table 1 | Pair 4, field ATE | 3.0 |  |  |
-| Table 1 | Pair 5, lab ATE | 2.0 |  |  |
-| Table 1 | Pair 5, field ATE | -1.5 |  |  |
-| Table 1 | Pair 6, lab ATE | 0.5 |  |  |
-| Table 1 | Pair 6, field ATE | 4.0 |  |  |
-| Table 1 | Pair 7, lab ATE | -2.0 |  |  |
-| Table 1 | Pair 7, field ATE | 1.5 |  |  |
-| Table 1 | Pair 8, lab ATE | -2.0 |  |  |
-| Table 1 | Pair 8, field ATE | 2.0 |  |  |
-| Table 2 | Subjects (A) | 2.00 | 2 | 1 |
-| Table 2 | Treatments (T1) | 1.00 | 1 | 1 |
-| Table 2 | Outcomes (Effort) | 1.00 | 1 | 1 |
-| Table 2 | Contexts (Field) | 1.00 | 1 | 1 |
-| Table 2 | Constant | -0.94 | -0.9375 | 1 |
+| Table 1, p. 120 | Pair 1, lab ATE | 2.0 |  |  |
+| Table 1, p. 120 | Pair 1, field ATE | 0.5 |  |  |
+| Table 1, p. 120 | Pair 2, lab ATE | 5.0 |  |  |
+| Table 1, p. 120 | Pair 2, field ATE | 4.0 |  |  |
+| Table 1, p. 120 | Pair 3, lab ATE | 3.0 |  |  |
+| Table 1, p. 120 | Pair 3, field ATE | 3.0 |  |  |
+| Table 1, p. 120 | Pair 4, lab ATE | 0.0 |  |  |
+| Table 1, p. 120 | Pair 4, field ATE | 3.0 |  |  |
+| Table 1, p. 120 | Pair 5, lab ATE | 2.0 |  |  |
+| Table 1, p. 120 | Pair 5, field ATE | -1.5 |  |  |
+| Table 1, p. 120 | Pair 6, lab ATE | 0.5 |  |  |
+| Table 1, p. 120 | Pair 6, field ATE | 4.0 |  |  |
+| Table 1, p. 120 | Pair 7, lab ATE | -2.0 |  |  |
+| Table 1, p. 120 | Pair 7, field ATE | 1.5 |  |  |
+| Table 1, p. 120 | Pair 8, lab ATE | -2.0 |  |  |
+| Table 1, p. 120 | Pair 8, field ATE | 2.0 |  |  |
+| Table 2, p. 120 | Subjects (A) | 2.00 | 2 | 1 |
+| Table 2, p. 120 | Treatments (T1) | 1.00 | 1 | 1 |
+| Table 2, p. 120 | Outcomes (Effort) | 1.00 | 1 | 1 |
+| Table 2, p. 120 | Contexts (Field) | 1.00 | 1 | 1 |
+| Table 2, p. 120 | Constant | -0.94 | -0.9375 | 1 |
 | Text, p. 120 | Units A-type subjects add, quoted into prose | 2 | 2 | 1 |
 | Text, p. 120 | Units treatment T1 adds, quoted into prose | 1 | 1 | 1 |
 | Text, p. 120 | Units the effort outcome adds, quoted into prose | 1 | 1 | 1 |
 | Text, p. 120 | Units the field context adds, quoted into prose | 1 | 1 | 1 |
-| Table 3 | Parallel lab-field study pairs | 12 | 12 | 1 |
+| Table 3, p. 125 | Parallel lab-field study pairs | 12 | 12 | 1 |
 | Text, p. 120 | Correlation across the eight hypothetical pairs | 0.14 |  |  |
 | Text, p. 121 | Correlation across the eight hypothetical pairs, restated a page later | 0.14 |  |  |
 | Text, p. 121 | Correlation when Pairs 1 and 5 go unreported | 0.76 |  |  |
-| Figure 1 | Jerit panel, Pearson correlation | 0.21 | 0.211055 | 1 |
-| Figure 1 | Jerit panel, Spearman correlation | 0.26 | 0.259963 | 1 |
-| Figure 2 | Pooled treatment effect pairs | 21 | 21 | 1 |
-| Figure 2 | Rank-order correlation printed on the figure | 0.73 | 0.727509 | 1 |
-| Text, p. 125 | Rank-order correlation in the sentence describing Figure 2 | 0.73 | 0.727509 | 1 |
-| Abstract | Rank-order correlation | 0.73 | 0.727509 | 1 |
-| Introduction | Rank-order correlation | 0.73 | 0.727509 | 1 |
-| Footnote 5 | Jerit candidate pairs | 17 | 17 | 1 |
-| Footnote 5 | Lowest pooled rho across the candidates | 0.699 | 0.699578 | 0 |
-| Footnote 5 | Highest pooled rho across the candidates | 0.762 | 0.761936 | 1 |
-| Footnote 5 | Pooled rho including all 17 Jerit pairs | 0.56 |  |  |
-| Footnote 6 | Combinations sampled where more than 50,000 exist | 50000 | 50000 | 1 |
-| Footnote 6 | Smallest number of dropped pairs at which the cap binds | 7 |  |  |
+| Figure 1, p. 124 | Jerit panel, Pearson correlation | 0.21 | 0.211055 | 1 |
+| Figure 1, p. 124 | Jerit panel, Spearman correlation | 0.26 | 0.259963 | 1 |
+| Figure 2, p. 126 | Pooled treatment effect pairs | 21 | 21 | 1 |
+| Figure 2, p. 126 | Rank-order correlation printed on the figure | 0.73 | 0.727509 | 1 |
+| Results, p. 125 | Rank-order correlation in the sentence describing Figure 2 | 0.73 | 0.727509 | 1 |
+| Abstract, p. 113 | Rank-order correlation | 0.73 | 0.727509 | 1 |
+| Introduction, p. 116 | Rank-order correlation | 0.73 | 0.727509 | 1 |
+| Footnote 5, p. 124 | Jerit candidate pairs | 17 | 17 | 1 |
+| Footnote 5, p. 124 | Lowest pooled rho across the candidates | 0.699 | 0.699578 | 0 |
+| Footnote 5, p. 124 | Highest pooled rho across the candidates | 0.762 | 0.761936 | 1 |
+| Footnote 5, p. 125 | Pooled rho including all 17 Jerit pairs | 0.56 |  |  |
+| Footnote 6, p. 125 | Combinations sampled where more than 50,000 exist | 50000 | 50000 | 1 |
+| Footnote 6, p. 125 | Smallest number of dropped pairs at which the cap binds | 7 |  |  |
 | Figure 3 | Lowest 25th percentile across the combination sizes |  | 0.633259 |  |
 | Figure 3 | Highest 75th percentile across the combination sizes |  | 0.790909 |  |
-| Figure 3 | Interquartile range stays within 0.6 to 0.8 across every combination size | 1 | 1 | 1 |
-| Figure 3 | Minimum correlation crosses zero when any ten pairs are dropped | 1 | 1 | 1 |
-| Figure 3 | Highest correlation when any ten pairs are dropped | 1 | 0.972727 |  |
-| Figure 3 | Distinct values of the median correlation, to two decimal places | 1 | 2 | 0 |
-| Figure 3 | Every available combination is evaluated | 1 |  |  |
+| Results, p. 126 | Interquartile range stays within 0.6 to 0.8 across every combination size | 1 | 1 | 1 |
+| Results, p. 126 | Minimum correlation crosses zero when any ten pairs are dropped | 1 | 1 | 1 |
+| Results, p. 126 | Highest correlation when any ten pairs are dropped | 1 | 0.972727 |  |
+| Results, pp. 125-126 | Distinct values of the median correlation, to two decimal places | 1 | 2 | 0 |
+| Figure 3 note, p. 127 | Every available combination is evaluated | 1 |  |  |
 | Figure 3 | Largest change in a plotted summary value under the R 3.6 sampler |  | 0.0735553 |  |
-| Discussion | Median lab sample size per treatment condition | 40 |  |  |
-| Discussion | Median field sample size per treatment condition | 37.5 |  |  |
-| Discussion | Raw Pearson correlation across the 21 pairs | 0.64 | 0.642814 | 1 |
-| Discussion | Lab reliability | 0.78 | 0.78334 | 1 |
-| Discussion | Field reliability | 0.82 | 0.823976 | 1 |
-| Discussion | Raw Pearson correlation restated inside the disattenuation formula | 0.64 | 0.642814 | 1 |
-| Discussion | Lab reliability restated inside the disattenuation formula | 0.78 | 0.78334 | 1 |
-| Discussion | Field reliability restated inside the disattenuation formula | 0.82 | 0.823976 | 1 |
-| Discussion | Disattenuated correlation | 0.80 | 0.800116 | 1 |
+| Discussion, p. 127 | Median lab sample size per treatment condition | 40 |  |  |
+| Discussion, p. 127 | Median field sample size per treatment condition | 37.5 |  |  |
+| Discussion, p. 128 | Raw Pearson correlation across the 21 pairs | 0.64 | 0.642814 | 1 |
+| Discussion, p. 128 | Lab reliability | 0.78 | 0.78334 | 1 |
+| Discussion, p. 128 | Field reliability | 0.82 | 0.823976 | 1 |
+| Discussion, p. 128 | Raw Pearson correlation restated inside the disattenuation formula | 0.64 | 0.642814 | 1 |
+| Discussion, p. 128 | Lab reliability restated inside the disattenuation formula | 0.78 | 0.78334 | 1 |
+| Discussion, p. 128 | Field reliability restated inside the disattenuation formula | 0.82 | 0.823976 | 1 |
+| Discussion, p. 128 | Disattenuated correlation | 0.80 | 0.800116 | 1 |
 | Footnote 7 | Lab reliability under the published definition | 0.78 | 0.78334 | 1 |
 | Footnote 7 | Field reliability under the published definition | 0.82 | 0.823976 | 1 |
 | Footnote 7 | Disattenuated correlation under the published definition |  | 0.800116 |  |
@@ -657,65 +660,65 @@ partly to Monte Carlo noise.
 
 | Location | Quantity | Paper | Rewrite | Match |
 |:---|:---|:---|:---|:---|
-| Table 1 | Pair 1, lab ATE | 2.0 | 2 | 1 |
-| Table 1 | Pair 1, field ATE | 0.5 | 0.5 | 1 |
-| Table 1 | Pair 2, lab ATE | 5.0 | 5 | 1 |
-| Table 1 | Pair 2, field ATE | 4.0 | 4 | 1 |
-| Table 1 | Pair 3, lab ATE | 3.0 | 3 | 1 |
-| Table 1 | Pair 3, field ATE | 3.0 | 3 | 1 |
-| Table 1 | Pair 4, lab ATE | 0.0 | 0 | 1 |
-| Table 1 | Pair 4, field ATE | 3.0 | 3 | 1 |
-| Table 1 | Pair 5, lab ATE | 2.0 | 2 | 1 |
-| Table 1 | Pair 5, field ATE | -1.5 | -1.5 | 1 |
-| Table 1 | Pair 6, lab ATE | 0.5 | 0.5 | 1 |
-| Table 1 | Pair 6, field ATE | 4.0 | 4 | 1 |
-| Table 1 | Pair 7, lab ATE | -2.0 | -2 | 1 |
-| Table 1 | Pair 7, field ATE | 1.5 | 1.5 | 1 |
-| Table 1 | Pair 8, lab ATE | -2.0 | -2 | 1 |
-| Table 1 | Pair 8, field ATE | 2.0 | 2 | 1 |
-| Table 2 | Subjects (A) | 2.00 | 2 | 1 |
-| Table 2 | Treatments (T1) | 1.00 | 1 | 1 |
-| Table 2 | Outcomes (Effort) | 1.00 | 1 | 1 |
-| Table 2 | Contexts (Field) | 1.00 | 1 | 1 |
-| Table 2 | Constant | -0.94 | -0.9375 | 1 |
+| Table 1, p. 120 | Pair 1, lab ATE | 2.0 | 2 | 1 |
+| Table 1, p. 120 | Pair 1, field ATE | 0.5 | 0.5 | 1 |
+| Table 1, p. 120 | Pair 2, lab ATE | 5.0 | 5 | 1 |
+| Table 1, p. 120 | Pair 2, field ATE | 4.0 | 4 | 1 |
+| Table 1, p. 120 | Pair 3, lab ATE | 3.0 | 3 | 1 |
+| Table 1, p. 120 | Pair 3, field ATE | 3.0 | 3 | 1 |
+| Table 1, p. 120 | Pair 4, lab ATE | 0.0 | 0 | 1 |
+| Table 1, p. 120 | Pair 4, field ATE | 3.0 | 3 | 1 |
+| Table 1, p. 120 | Pair 5, lab ATE | 2.0 | 2 | 1 |
+| Table 1, p. 120 | Pair 5, field ATE | -1.5 | -1.5 | 1 |
+| Table 1, p. 120 | Pair 6, lab ATE | 0.5 | 0.5 | 1 |
+| Table 1, p. 120 | Pair 6, field ATE | 4.0 | 4 | 1 |
+| Table 1, p. 120 | Pair 7, lab ATE | -2.0 | -2 | 1 |
+| Table 1, p. 120 | Pair 7, field ATE | 1.5 | 1.5 | 1 |
+| Table 1, p. 120 | Pair 8, lab ATE | -2.0 | -2 | 1 |
+| Table 1, p. 120 | Pair 8, field ATE | 2.0 | 2 | 1 |
+| Table 2, p. 120 | Subjects (A) | 2.00 | 2 | 1 |
+| Table 2, p. 120 | Treatments (T1) | 1.00 | 1 | 1 |
+| Table 2, p. 120 | Outcomes (Effort) | 1.00 | 1 | 1 |
+| Table 2, p. 120 | Contexts (Field) | 1.00 | 1 | 1 |
+| Table 2, p. 120 | Constant | -0.94 | -0.9375 | 1 |
 | Text, p. 120 | Units A-type subjects add, quoted into prose | 2 | 2 | 1 |
 | Text, p. 120 | Units treatment T1 adds, quoted into prose | 1 | 1 | 1 |
 | Text, p. 120 | Units the effort outcome adds, quoted into prose | 1 | 1 | 1 |
 | Text, p. 120 | Units the field context adds, quoted into prose | 1 | 1 | 1 |
-| Table 3 | Parallel lab-field study pairs | 12 | 12 | 1 |
+| Table 3, p. 125 | Parallel lab-field study pairs | 12 | 12 | 1 |
 | Text, p. 120 | Correlation across the eight hypothetical pairs | 0.14 | 0.139999 | 1 |
 | Text, p. 121 | Correlation across the eight hypothetical pairs, restated a page later | 0.14 | 0.139999 | 1 |
 | Text, p. 121 | Correlation when Pairs 1 and 5 go unreported | 0.76 | 0.764266 | 1 |
-| Figure 1 | Jerit panel, Pearson correlation | 0.21 | 0.211055 | 1 |
-| Figure 1 | Jerit panel, Spearman correlation | 0.26 | 0.259963 | 1 |
-| Figure 2 | Pooled treatment effect pairs | 21 | 21 | 1 |
-| Figure 2 | Rank-order correlation printed on the figure | 0.73 | 0.731406 | 1 |
-| Text, p. 125 | Rank-order correlation in the sentence describing Figure 2 | 0.73 | 0.731406 | 1 |
-| Abstract | Rank-order correlation | 0.73 | 0.731406 | 1 |
-| Introduction | Rank-order correlation | 0.73 | 0.731406 | 1 |
-| Footnote 5 | Jerit candidate pairs | 17 | 17 | 1 |
-| Footnote 5 | Lowest pooled rho across the candidates | 0.699 | 0.705424 | 0 |
-| Footnote 5 | Highest pooled rho across the candidates | 0.762 | 0.767132 | 0 |
-| Footnote 5 | Pooled rho including all 17 Jerit pairs | 0.56 | 0.558066 | 1 |
-| Footnote 6 | Combinations sampled where more than 50,000 exist | 50000 | 50000 | 1 |
-| Footnote 6 | Smallest number of dropped pairs at which the cap binds | 7 | 6 | 0 |
+| Figure 1, p. 124 | Jerit panel, Pearson correlation | 0.21 | 0.211055 | 1 |
+| Figure 1, p. 124 | Jerit panel, Spearman correlation | 0.26 | 0.259963 | 1 |
+| Figure 2, p. 126 | Pooled treatment effect pairs | 21 | 21 | 1 |
+| Figure 2, p. 126 | Rank-order correlation printed on the figure | 0.73 | 0.731406 | 1 |
+| Results, p. 125 | Rank-order correlation in the sentence describing Figure 2 | 0.73 | 0.731406 | 1 |
+| Abstract, p. 113 | Rank-order correlation | 0.73 | 0.731406 | 1 |
+| Introduction, p. 116 | Rank-order correlation | 0.73 | 0.731406 | 1 |
+| Footnote 5, p. 124 | Jerit candidate pairs | 17 | 17 | 1 |
+| Footnote 5, p. 124 | Lowest pooled rho across the candidates | 0.699 | 0.705424 | 0 |
+| Footnote 5, p. 124 | Highest pooled rho across the candidates | 0.762 | 0.767132 | 0 |
+| Footnote 5, p. 125 | Pooled rho including all 17 Jerit pairs | 0.56 | 0.558066 | 1 |
+| Footnote 6, p. 125 | Combinations sampled where more than 50,000 exist | 50000 | 50000 | 1 |
+| Footnote 6, p. 125 | Smallest number of dropped pairs at which the cap binds | 7 | 6 | 0 |
 | Figure 3 | Lowest 25th percentile across the combination sizes |  | 0.636364 |  |
 | Figure 3 | Highest 75th percentile across the combination sizes |  | 0.8 |  |
-| Figure 3 | Interquartile range stays within 0.6 to 0.8 across every combination size | 1 | 1 | 1 |
-| Figure 3 | Minimum correlation crosses zero when any ten pairs are dropped | 1 | 1 | 1 |
-| Figure 3 | Highest correlation when any ten pairs are dropped | 1 | 0.981818 |  |
-| Figure 3 | Distinct values of the median correlation, to two decimal places | 1 | 3 | 0 |
-| Figure 3 | Every available combination is evaluated | 1 | 0 | 0 |
+| Results, p. 126 | Interquartile range stays within 0.6 to 0.8 across every combination size | 1 | 1 | 1 |
+| Results, p. 126 | Minimum correlation crosses zero when any ten pairs are dropped | 1 | 1 | 1 |
+| Results, p. 126 | Highest correlation when any ten pairs are dropped | 1 | 0.981818 |  |
+| Results, pp. 125-126 | Distinct values of the median correlation, to two decimal places | 1 | 3 | 0 |
+| Figure 3 note, p. 127 | Every available combination is evaluated | 1 | 0 | 0 |
 | Figure 3 | Largest change in a plotted summary value under the R 3.6 sampler |  |  |  |
-| Discussion | Median lab sample size per treatment condition | 40 | 40 | 1 |
-| Discussion | Median field sample size per treatment condition | 37.5 | 37.5 | 1 |
-| Discussion | Raw Pearson correlation across the 21 pairs | 0.64 | 0.649911 | 0 |
-| Discussion | Lab reliability | 0.78 | 0.882705 | 0 |
-| Discussion | Field reliability | 0.82 | 0.903386 | 0 |
-| Discussion | Raw Pearson correlation restated inside the disattenuation formula | 0.64 | 0.649911 | 0 |
-| Discussion | Lab reliability restated inside the disattenuation formula | 0.78 | 0.882705 | 0 |
-| Discussion | Field reliability restated inside the disattenuation formula | 0.82 | 0.903386 | 0 |
-| Discussion | Disattenuated correlation | 0.80 | 0.727795 | 0 |
+| Discussion, p. 127 | Median lab sample size per treatment condition | 40 | 40 | 1 |
+| Discussion, p. 127 | Median field sample size per treatment condition | 37.5 | 37.5 | 1 |
+| Discussion, p. 128 | Raw Pearson correlation across the 21 pairs | 0.64 | 0.649911 | 0 |
+| Discussion, p. 128 | Lab reliability | 0.78 | 0.882705 | 0 |
+| Discussion, p. 128 | Field reliability | 0.82 | 0.903386 | 0 |
+| Discussion, p. 128 | Raw Pearson correlation restated inside the disattenuation formula | 0.64 | 0.649911 | 0 |
+| Discussion, p. 128 | Lab reliability restated inside the disattenuation formula | 0.78 | 0.882705 | 0 |
+| Discussion, p. 128 | Field reliability restated inside the disattenuation formula | 0.82 | 0.903386 | 0 |
+| Discussion, p. 128 | Disattenuated correlation | 0.80 | 0.727795 | 0 |
 | Footnote 7 | Lab reliability under the published definition | 0.78 | 0.781773 | 1 |
 | Footnote 7 | Field reliability under the published definition | 0.82 | 0.817887 | 1 |
 | Footnote 7 | Disattenuated correlation under the published definition |  | 0.812768 |  |
@@ -743,9 +746,9 @@ identical once the embedded `CreationDate` and `ModDate` are stripped.
 
 | Item      | Value                  |
 |:----------|:-----------------------|
-| R version | 4.6.0                  |
+| R version | 4.6.2                  |
 | Platform  | aarch64-apple-darwin23 |
-| Date run  | 2026-09-27             |
+| Date run  | 2026-11-12             |
 
 | Package      | Version |
 |:-------------|:--------|
@@ -756,8 +759,8 @@ identical once the embedded `CreationDate` and `ModDate` are stripped.
 | estimatr     | 2.0.1   |
 | modelsummary | 2.6.0   |
 | patchwork    | 1.3.2   |
-| knitr        | 1.51    |
-| kableExtra   | 1.4.0   |
+| knitr        | 1.52    |
+| kableExtra   | 1.4.1   |
 | archive      | 1.1.14  |
 | here         | 1.0.2   |
 

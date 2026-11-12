@@ -1,0 +1,7 @@
+float,published_numbers,covered,reproduced_by_rewrite,reproduced_by_archive,plotted,plotted_reproduced,note
+Table 1,16,16,16,NA,NA,NA,NA
+Table 2,5,5,5,5,NA,NA,NA
+Table 3,0,0,0,0,NA,NA,Lists the twelve study pairs by name and purpose; prints no numbers.
+Figure 1,2,2,2,2,49,49,"Prints the Pearson and Spearman correlations inside the Jerit, Barabas and Clifford panel; plotted counts the points across the twelve panels."
+Figure 2,1,1,1,1,21,21,Prints the pooled rank-order correlation on its face; plotted counts the 21 standardized pairs.
+Figure 3,0,0,0,0,105,105,"Prints no numbers; plotted counts five summary series across 21 subset sizes. The sampled sizes cannot match the deposit draw for draw, for the reasons text_sampler_reproducibility.R measures."

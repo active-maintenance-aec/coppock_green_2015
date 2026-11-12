@@ -81,18 +81,18 @@ That fetches the deposit, verifies it, produces every table and figure into `mai
 ```{r summary_setup, include=FALSE}
 n_claims <- nrow(gt)
 n_archive_verifiable <- sum(!is.na(gt$match))
-n_archive_match <- sum(gt$match == 1, na.rm = TRUE)
-n_archive_fail <- sum(gt$match == 0, na.rm = TRUE)
+n_archive_match <- sum(gt$match, na.rm = TRUE)
+n_archive_fail <- sum(!gt$match, na.rm = TRUE)
 n_rewrite_verifiable <- sum(!is.na(gt$match_rewrite))
-n_rewrite_match <- sum(gt$match_rewrite == 1, na.rm = TRUE)
-n_rewrite_differ <- sum(gt$match_rewrite == 0, na.rm = TRUE)
+n_rewrite_match <- sum(gt$match_rewrite, na.rm = TRUE)
+n_rewrite_differ <- sum(!gt$match_rewrite, na.rm = TRUE)
 n_unverifiable <- sum(is.na(gt$value_paper))
-n_appendix_rows <- sum(gt$table_figure == "Online Appendix Table 1")
-n_fig3_unverifiable <- sum(gt$table_figure == "Figure 3" & is.na(gt$value_paper))
+n_appendix_rows <- sum(gt$location == "Online Appendix Table 1")
+n_fig3_unverifiable <- sum(gt$location == "Figure 3" & is.na(gt$value_paper))
 n_locus_archive <- sum(gt$defect_locus == "archive", na.rm = TRUE)
 n_locus_paper <- sum(gt$defect_locus == "paper_internal", na.rm = TRUE)
 n_no_script <- sum(is.na(gt$value_script) & !is.na(gt$value_paper) &
-                     gt$table_figure != "Table 1")
+                     !str_starts(gt$location, "Table 1,"))
 
 n_extraction <- nrow(claims)
 n_needs_block <- sum(claims$needs_block)
@@ -313,9 +313,10 @@ The rank-order correlation the paper leads with is untouched: it moves from 0.72
 
 ```{r gt_table}
 gt |>
-  mutate(across(where(is.numeric), show_number),
+  mutate(across(c(match, match_rewrite), as.integer),
+         across(where(is.numeric), show_number),
          across(everything(), \(x) replace_na(as.character(x), ""))) |>
-  select(table_figure, claim, value_paper, value_script, match) |>
+  select(location, claim, value_paper, value_script, match) |>
   kable(
     booktabs = TRUE,
     col.names = c("Location", "Quantity", "Paper", "Archive", "Match"),
@@ -466,9 +467,10 @@ The reliability simulation is a different matter, and there the rewrite matches 
 
 ```{r rewrite_verify}
 gt |>
-  mutate(across(where(is.numeric), show_number),
+  mutate(across(c(match, match_rewrite), as.integer),
+         across(where(is.numeric), show_number),
          across(everything(), \(x) replace_na(as.character(x), ""))) |>
-  select(table_figure, claim, value_paper, value_rewrite, match_rewrite) |>
+  select(location, claim, value_paper, value_rewrite, match_rewrite) |>
   kable(
     booktabs = TRUE,
     col.names = c("Location", "Quantity", "Paper", "Rewrite", "Match"),

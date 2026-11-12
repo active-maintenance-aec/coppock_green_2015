@@ -1,0 +1,15 @@
+pass,script,role,exit_status,outcome,stopped_at
+as_shipped,Coppock Green Lab Field Tables 1 and 2 Code.R,analysis,0,clean,NA
+as_shipped,Coppock Green Lab Field Figure 1 Code.R,analysis,0,clean,NA
+as_shipped,Coppock Green Lab Field Figure 2 Code.R,analysis,0,clean,NA
+as_shipped,Coppock Green Lab Field Figure 3 Code.R,analysis,0,clean,NA
+as_shipped,Coppock Green Lab Field Appendix Table Code.R,analysis,1,error,"Error in setwd("""") : cannot change working directory Calls: source -> withVisible -> eval -> eval -> setwd"
+as_shipped,Coppock Green Lab Field Disattenuation Code.R,analysis,0,clean,NA
+as_shipped,tables1and2.r,other,0,clean,NA
+stripped,Coppock Green Lab Field Tables 1 and 2 Code.R,analysis,0,clean,NA
+stripped,Coppock Green Lab Field Figure 1 Code.R,analysis,0,clean,NA
+stripped,Coppock Green Lab Field Figure 2 Code.R,analysis,0,clean,NA
+stripped,Coppock Green Lab Field Figure 3 Code.R,analysis,0,clean,NA
+stripped,Coppock Green Lab Field Appendix Table Code.R,analysis,1,error,"Error in setwd("""") : cannot change working directory Calls: source -> withVisible -> eval -> eval -> setwd"
+stripped,Coppock Green Lab Field Disattenuation Code.R,analysis,0,clean,NA
+stripped,tables1and2.r,other,0,clean,NA

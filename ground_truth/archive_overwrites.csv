@@ -1,0 +1,10 @@
+pass,file,effect,matches_deposit
+as_shipped,rankorderrobustness.pdf,overwritten,FALSE
+as_shipped,setoftwelve.rdata,overwritten,TRUE
+as_shipped,standardized.pdf,overwritten,FALSE
+as_shipped,tiles_landscape.pdf,overwritten,FALSE
+stripped,meanstable.csv,withheld,NA
+stripped,setoftwelve.rdata,rebuilt,TRUE
+stripped,tiles_landscape.pdf,rebuilt,FALSE
+stripped,standardized.pdf,rebuilt,FALSE
+stripped,rankorderrobustness.pdf,rebuilt,FALSE

@@ -1,5 +1,6 @@
 # coppock_green_2015/ground_truth/build_ground_truth.R
-# Output: ground_truth/coppock_green_2015_ground_truth.csv
+# Output: ground_truth/coppock_green_2015_ground_truth.csv,
+#   ground_truth/float_coverage.csv
 # Depends on: maintained/output/ (run run_all.R first)
 # Description: Assemble the ground truth table. Every value_paper entry was read
 #   from the published article and is used only as a comparison target; no
@@ -421,15 +422,152 @@ if (any(!cross_check$agrees)) print(cross_check |> filter(!agrees), n = Inf, wid
 stopifnot(length(setdiff(required_rows, cross_check$claim_id)) == 0,
           all(cross_check$agrees))
 
+# Claim type, printed precision and location, carried from the extraction ----
+# Every claim id here names an extraction row, so a row with one takes its claim type,
+# its digits and its location from published_claims.csv. A row without one records
+# something the article does not state as a number, and is a pipeline quantity whose
+# precision is read off the string the article prints. The one digits override this
+# script carries, for the approximate claim, has to be the one the extraction carries.
 gt <- gt |>
-  select(paper_id, claim_id, table_figure, claim, value_script, value_paper, match,
-         value_rewrite, match_rewrite, defect_locus, notes)
+  left_join(select(claims, claim_id, claim_type, digits, location), by = "claim_id") |>
+  mutate(digits = as.integer(digits))
 
+override_check <- tibble(claim_id = names(approximate_precision),
+                         override = unname(approximate_precision)) |>
+  left_join(select(gt, claim_id, digits), by = "claim_id")
+if (any(override_check$override != override_check$digits)) {
+  print(override_check)
+  stop("A digits override in this script disagrees with the extraction.")
+}
+
+gt <- gt |>
+  mutate(
+    location = if_else(is.na(claim_id), table_figure, location),
+    claim_type = if_else(is.na(claim_id), "pipeline", claim_type),
+    digits = if_else(is.na(claim_id), excheckr::claim_digits(value_paper), digits)
+  )
+
+stopifnot(!anyNA(gt$location), !anyNA(gt$claim_type))
+
+# Disposition: what became of each defect ----
+# corrected_here is computed from the errata spine and never typed. Every row this
+# repository attributes to a defect is named by an errata entry, so no judgment is
+# recorded by hand; a row that is not stays NA until someone decides what became of it.
+gt <- gt |>
+  mutate(
+    disposition = case_when(
+      is.na(defect_locus) ~ NA_character_,
+      !is.na(claim_id) & claim_id %in% cited_claim_ids ~ "corrected_here",
+      .default = NA_character_
+    ),
+    disposition_reason = NA_character_
+  )
+
+undisposed <- gt |> filter(defect_locus == "paper_internal", is.na(disposition))
+if (nrow(undisposed) > 0) {
+  print(undisposed |> select(claim_id, location, claim), n = nrow(undisposed))
+  stop(str_glue("{nrow(undisposed)} paper_internal rows carry no disposition."))
+}
+print(gt |> filter(!is.na(defect_locus)) |> count(defect_locus, disposition))
+
+# Float coverage ----
+# One row per published float. A table's published_numbers counts the cells it prints,
+# as transcribed above; a figure's counts the numbers printed on its face, and its
+# plotted count is what the article draws, read from the extraction's structural claims
+# about the figure. A plotted quantity counts as reproduced when the second instrument
+# scores the claim that counts it a match. The online appendix tables the text cites
+# are not floats here, because the published appendix does not contain them.
+face_cells <- tribble(
+  ~float, ~pattern,
+  "Table 1", "^t1_pair[0-9]+_(lab|field)$",
+  "Table 2", "^t2_(subjects_a|treatments_t1|outcomes_effort|contexts_field|constant)$",
+  "Figure 1", "^fig1_jerit_(pearson|spearman)$",
+  "Figure 2", "^fig2_rho$"
+)
+
+cell_counts <- face_cells |>
+  mutate(rows = map(pattern, \(p) filter(gt, str_detect(replace_na(claim_id, ""), p)))) |>
+  transmute(
+    float,
+    published_numbers = map_int(rows, nrow),
+    covered = map_int(rows, \(r) sum(!is.na(r$value_paper) & !is.na(r$value_rewrite))),
+    reproduced_by_rewrite = map_int(rows, \(r) sum(r$match_rewrite == 1, na.rm = TRUE)),
+    reproduced_by_archive = map_int(rows, \(r) {
+      if (all(is.na(r$match))) NA_integer_ else sum(r$match == 1, na.rm = TRUE)
+    })
+  )
+
+# What each figure draws, as products of the extraction's counts: Figure 1 a point per
+# group mean or treatment effect in each of its twelve panels, Figure 2 a point per
+# pooled pair, Figure 3 five summary series across its x-axis categories.
+plotted_claims <- tribble(
+  ~float, ~pattern,
+  "Figure 1", "^fig1_points_",
+  "Figure 2", "^fig2_points$",
+  "Figure 3", "^fig3_(series|x_categories)$"
+)
+
+plotted_counts <- plotted_claims |>
+  mutate(
+    rows = map(pattern, \(p) {
+      filter(claims, str_detect(claim_id, p)) |>
+        left_join(select(printed, claim_id, verdict), by = "claim_id")
+    }),
+    terms = map(rows, \(r) as.integer(r$value_paper)),
+    plotted = if_else(float == "Figure 3", map_int(terms, prod), map_int(terms, sum)),
+    plotted_reproduced = pmap_int(list(float, rows, plotted), \(f, r, n) {
+      if (f == "Figure 3") {
+        if (all(r$verdict == "match")) n else 0L
+      } else {
+        sum(as.integer(r$value_paper[r$verdict == "match"]))
+      }
+    })
+  ) |>
+  select(float, plotted, plotted_reproduced)
+
+float_notes <- c(
+  "Table 3" = "Lists the twelve study pairs by name and purpose; prints no numbers.",
+  "Figure 1" = "Prints the Pearson and Spearman correlations inside the Jerit, Barabas and Clifford panel; plotted counts the points across the twelve panels.",
+  "Figure 2" = "Prints the pooled rank-order correlation on its face; plotted counts the 21 standardized pairs.",
+  "Figure 3" = "Prints no numbers; plotted counts five summary series across 21 subset sizes. The sampled sizes cannot match the deposit draw for draw, for the reasons text_sampler_reproducibility.R measures."
+)
+
+float_coverage <- tibble(float = c("Table 1", "Table 2", "Table 3",
+                                   "Figure 1", "Figure 2", "Figure 3")) |>
+  left_join(cell_counts, by = "float") |>
+  left_join(plotted_counts, by = "float") |>
+  mutate(
+    published_numbers = replace_na(published_numbers, 0L),
+    covered = replace_na(covered, 0L),
+    reproduced_by_rewrite = replace_na(reproduced_by_rewrite, 0L),
+    reproduced_by_archive = if_else(float %in% cell_counts$float, reproduced_by_archive, 0L),
+    note = unname(float_notes[float])
+  ) |>
+  select(float, published_numbers, covered, reproduced_by_rewrite, reproduced_by_archive,
+         plotted, plotted_reproduced, note)
+
+stopifnot(
+  all(float_coverage$covered == float_coverage$published_numbers),
+  all(is.na(float_coverage$plotted[str_starts(float_coverage$float, "Table")])),
+  !anyNA(float_coverage$plotted[str_starts(float_coverage$float, "Figure")])
+)
+
+write_csv(float_coverage, here::here("ground_truth", "float_coverage.csv"))
+print(float_coverage, n = nrow(float_coverage), width = 200)
+
+# The ground truth, in the canonical column order ----
+# holds is NA throughout: every claim with a truth value here is scored as a 0 or 1
+# indicator against the article's 1, so its verdict is already in match and match_rewrite.
+gt <- gt |>
+  mutate(across(c(match, match_rewrite), as.logical), holds = NA) |>
+  select(paper_id, claim_id, location, claim_type, claim, value_paper, digits,
+         value_script, match, value_rewrite, match_rewrite, holds, defect_locus,
+         disposition, disposition_reason, notes)
 
 write_csv(gt, here::here("ground_truth", "coppock_green_2015_ground_truth.csv"))
 
-print(gt |> select(claim_id, table_figure, claim, value_script, value_paper, match,
-                   value_rewrite, match_rewrite),
+print(gt |> select(claim_id, location, claim, value_script, value_paper, match,
+                   value_rewrite, match_rewrite, defect_locus, disposition),
       n = nrow(gt), width = 200)
 print(tibble(
   quantity = c("rows", "archive comparable", "archive matching",
